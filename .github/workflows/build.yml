@@ -1,12 +1,10 @@
-name: Build and release
+name: Build
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [ "development" ]
   push:
     tags:
-      - 'v*'
+      - '*'
 
 jobs:
   build:
@@ -76,28 +74,3 @@ jobs:
       with:
         name: Installer-${{ matrix.config }}-${{ matrix.platform }}
         path: ${{ github.workspace }}/NSIS/Scripts/Output/*
-          
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    permissions:
-      contents: write
-    
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: installers
-          pattern: Installer-*
-          merge-multiple: true
-      
-      - name: Download release notes
-        run: wget https://raw.githubusercontent.com/TwinkieTweaks/TwinkieX/refs/heads/development/ReleaseNotes.md
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: installers/*
-          body_path: ReleaseNotes.md
