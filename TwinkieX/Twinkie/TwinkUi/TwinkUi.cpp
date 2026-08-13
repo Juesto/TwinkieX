@@ -29,6 +29,10 @@ namespace TwinkUiState
 	// The original present function definition for the device.
 	PresentFn oPresent = 0;
 
+#ifdef TMU
+	ResetFn oReset = 0;
+#endif
+
 	// The original window process definition for the window.
 	WNDPROC oWndProc = 0;
 
@@ -175,8 +179,15 @@ __declspec(noinline) void TwinkUi::Update(std::filesystem::path pDocumentsFolder
 	// Before hooking, make sure that our memory is writable
 	Unprotect(VirtualPtr(O_V_PRESENT, (uintptr_t)TwinkUiState::Device), sizeof(uintptr_t));
 
-	// Hook present
+	// Hook Present
 	TwinkUiState::oPresent = reinterpret_cast<PresentFn>(VirtualWrite(O_V_PRESENT, (uintptr_t)TwinkUiState::Device, (uintptr_t)hkPresent));
+
+#ifdef TMU
+	Unprotect(VirtualPtr(O_V_RESET, (uintptr_t)TwinkUiState::Device), sizeof(uintptr_t));
+
+	// Hook Reset
+	TwinkUiState::oReset = reinterpret_cast<ResetFn>(VirtualWrite(O_V_RESET, (uintptr_t)TwinkUiState::Device, (uintptr_t)hkReset));
+#endif
 #endif
 }
 
@@ -326,6 +337,17 @@ static long __stdcall hkPresent(LPDIRECT3DDEVICE9 pDevice, LPVOID A, LPVOID B, H
 
 	return TwinkUiState::oPresent(pDevice, A, B, C, D);
 }
+
+#ifdef TMU
+static long __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pParams)
+{
+	if (!TwinkUiState::ImGuiInit) return TwinkUiState::oReset(pDevice, pParams);
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+	const HRESULT result = TwinkUiState::oReset(pDevice, pParams);
+	ImGui_ImplDX9_CreateDeviceObjects();
+	return result;
+}
+#endif
 #elif defined(MANIAPLANET)
 void InitImGui(DirectXContext* Context, DirectXDevice* Device)
 {

@@ -34,8 +34,12 @@ HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UIN
 using DirectXDevice = IDirect3DDevice9;
 
 using PresentFn = long(__stdcall*)(LPDIRECT3DDEVICE9 pDevice, LPVOID, LPVOID, HWND, LPVOID);
+using ResetFn = long(__stdcall*)(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pParams);
 
 static long __stdcall hkPresent(LPDIRECT3DDEVICE9 pDevice, LPVOID A, LPVOID B, HWND C, LPVOID D);
+#ifdef TMU
+static long __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pParams);
+#endif
 
 static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
@@ -45,6 +49,12 @@ namespace TwinkUiState
 {
 	// The original present function definition for the device.
 	extern PresentFn oPresent;
+
+#ifdef TMU
+	// The original reset function definition for the device.
+	// Only for TMU, the rest don't use reset.
+	extern ResetFn oReset;
+#endif
 
 	// The original window process definition for the window.
 	extern WNDPROC oWndProc;

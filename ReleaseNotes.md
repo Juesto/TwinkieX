@@ -1,2 +1,2 @@
-- Added TMU support
-- Fixed input display not caring about being enabled or not
+- Fixed resize not working on TMU
+- Fixed .pdb file paths being very inconvienient

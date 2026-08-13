@@ -180,6 +180,7 @@ __declspec(noinline) uintptr_t VirtualWrite(unsigned int Idx, uintptr_t This, ui
 #define O_M_CINPUTDEVICE_ISDISABLED 0x0
 
 // Vtable indices
+#define O_V_RESET 16
 #define O_V_PRESENT 17
 
 #endif
