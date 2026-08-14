@@ -5,73 +5,70 @@ on:
   push:
     tags:
       - '*'
-
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - config: TMCN
-            platform: x64
-          - config: ESWC
-            platform: x86
-          - config: TMU
-            platform: x86
-          - config: TMO
-            platform: x86
-          - config: TMSX
-            platform: x86
-          - config: TM1
-            platform: x86
-  
+    env:
+      OUTPUT_DIR: ${{ github.workspace }}\NSIS\Scripts\Output
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Restore file timestamps
-      uses: chetan/git-restore-mtime-action@v2
+      - name: Restore file timestamps
+        uses: chetan/git-restore-mtime-action@v2
 
-    - name: Cache intermediate files
-      uses: actions/cache@v4
-      with:
-        path: Intermediates
-        key: ${{ runner.os }}-msbuild-${{ matrix.config }}-${{ matrix.platform }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-msbuild-${{ matrix.config }}-${{ matrix.platform }}-
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - name: Install NSIS
+        uses: negrutiu/nsis-install@v2
 
-    - name: Build Project
-      run: |
-        msbuild TwinkieX.sln `
-          /p:Configuration=${{ matrix.config }} `
-          /p:Platform=${{ matrix.platform }} `
-          /p:IncludePath="${{ github.workspace }}/TwinkieX/Includes" `
-          /p:PathMap="${{ github.workspace }}=C:/Dev/" `
-          /m
+      - name: Cache intermediate files
+        uses: actions/cache@v4
+        with:
+          path: Intermediates
+          key: ${{ runner.os }}-msbuild-all-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-msbuild-all-
 
-    - name: Install NSIS
-      uses: negrutiu/nsis-install@v2
+      - name: Build Project
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:OUTPUT_DIR" | Out-Null
 
-    - name: Create Installer
-      shell: pwsh
-      run: |
-        New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/NSIS/Scripts/Output"
-        makensis "${{ github.workspace }}/NSIS/Scripts/Installer${{ matrix.config }}.nsi"
-    
-    - name: Package built DLLs
-      shell: pwsh
-      run: |
-        $platform = $(if ("${{ matrix.platform }}" -eq "x86") { echo "Win32" } else { echo ${{ matrix.platform }} })
-        tar -a -c -f "${{ github.workspace }}/NSIS/Scripts/Output/${{ matrix.config }}.zip" -C "${{ github.workspace }}/Builds/$platform" "${{ matrix.config }}"
+          $configs = @(
+            @{ Config = "TMCN";  Platform = "x64" },
+            @{ Config = "ESWC";  Platform = "x86" },
+            @{ Config = "TMU";   Platform = "x86" },
+            @{ Config = "TMO";   Platform = "x86" },
+            @{ Config = "TMSX";  Platform = "x86" },
+            @{ Config = "TM1";   Platform = "x86" }
+          )
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Installer-${{ matrix.config }}-${{ matrix.platform }}
-        path: ${{ github.workspace }}/NSIS/Scripts/Output/*
+          foreach ($c in $configs) {
+            $config   = $c.Config
+            $platform = $c.Platform
+            $msPlatform = if ($platform -eq "x86") { "Win32" } else { $platform }
+
+            Write-Host "==== Building $config ($platform) ===="
+            msbuild TwinkieX.sln `
+              /p:Configuration=$config `
+              /p:Platform=$platform `
+              /m
+            if ($LASTEXITCODE -ne 0) { throw "msbuild failed for $config ($platform)" }
+
+            Write-Host "==== Creating installer for $config ===="
+            makensis "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
+            if ($LASTEXITCODE -ne 0) { throw "makensis failed for $config" }
+
+            Write-Host "==== Packaging DLLs for $config ===="
+            tar -a -c -f "$env:OUTPUT_DIR\$config.zip" -C "${{ github.workspace }}/Builds/$msPlatform" "$config"
+          }
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Installers
+          path: ${{ env.OUTPUT_DIR }}/*
