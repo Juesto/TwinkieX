@@ -59,7 +59,7 @@ namespace TwinkUiState
 	ID3D11RenderTargetView* MainRenderTargetView = nullptr;
 
 	ResizeBuffersFn oResizeBuffers = nullptr;
-#else defined(GAMEBOX)
+#elif defined(GAMEBOX)
 	// The new window size, when the window is resized.
 	unsigned int WindowWidth = 0;
 	// The new window size, when the window is resized.
@@ -121,6 +121,8 @@ __declspec(noinline) TwinkUi::~TwinkUi()
 
 __declspec(noinline) void TwinkUi::Update(std::filesystem::path pDocumentsFolderPath)
 {
+	IoMgr.Update();
+
 	this->DocumentsFolderPath = pDocumentsFolderPath;
 
 	// Get the device from the game
@@ -195,7 +197,7 @@ static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	if (!TwinkUiState::ImGuiInit)
 	{
-		return CallWindowProcA(TwinkUiState::oWndProc, hWnd, uMsg, wParam, lParam);
+		return CallWindowProc(TwinkUiState::oWndProc, hWnd, uMsg, wParam, lParam);
 	}
 
 	switch (uMsg)
@@ -208,8 +210,6 @@ static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			TwinkUiState::WindowWidth = LOWORD(lParam);
 			TwinkUiState::WindowHeight = HIWORD(lParam);
 			ImGui::GetIO().DisplaySize = ImVec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-
-			// Manually trigger a repaint even if shrinking
 			InvalidateRect(hWnd, NULL, FALSE);
 		}
 		break;
@@ -220,15 +220,13 @@ static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			if (SUCCEEDED(TwinkUiState::Device->GetSwapChain(0, &pSwapChain)))
 			{
 				D3DPRESENT_PARAMETERS d3dpp = {};
-				if (SUCCEEDED(pSwapChain->GetPresentParameters(&d3dpp)))
+				if (SUCCEEDED(pSwapChain->GetGetPresentParameters(&d3dpp)))
 				{
 					d3dpp.BackBufferWidth = TwinkUiState::WindowWidth;
 					d3dpp.BackBufferHeight = TwinkUiState::WindowHeight;
 
 					ImGui_ImplDX9_InvalidateDeviceObjects();
-
 					TwinkUiState::Device->Reset(&d3dpp);
-
 					ImGui_ImplDX9_CreateDeviceObjects();
 
 					unsigned int WindowStyle = GetWindowLongPtr(TwinkUiState::Window, GWL_STYLE);
@@ -244,31 +242,22 @@ static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 #endif
 #endif
 	case WM_FILE_SELECTED:
-	{
-		// Empty on purpose (for now)
 		break;
 	}
-	}
 
-	auto& ImIo = ImGui::GetIO();
+	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	auto ImWndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-	if (ImWndProcResult)
+	ImGuiIO& io = ImGui::GetIO();
+	if (TwinkUiState::RenderUi)
 	{
-		return ImWndProcResult;
-	}
-	if (uMsg == WM_KEYDOWN)
-	{
-		if (wParam == VK_F3 and !(lParam & 0xFF000000))
-			TwinkUiState::RenderUi = !TwinkUiState::RenderUi;
+		if (io.WantCaptureKeyboard && (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST))
+			return TRUE;
+
+		if (io.WantCaptureMouse && (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST))
+			return TRUE;
 	}
 
-	if ((uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST && ImIo.WantCaptureKeyboard) || (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST && ImIo.WantCaptureMouse))
-	{
-		return 1;
-	}
-
-	return CallWindowProcA(TwinkUiState::oWndProc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProc(TwinkUiState::oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
 #ifdef GAMEBOX
@@ -529,6 +518,15 @@ void TwinkUi::Render()
 {
 	using namespace ImGui;
 
+	IoMgr.Sync();
+
+	if (IsKeyPressed(ImGuiKey_F3, false))
+	{
+		TwinkUiState::RenderUi = !TwinkUiState::RenderUi;
+	}
+
+	if (!TwinkUiState::RenderUi) return;
+
 	if (Font) PushFont(Font, GetStyle().FontSizeBase * UiScale);
 
 	if (not ModuleQueue.empty())
@@ -541,74 +539,71 @@ void TwinkUi::Render()
 		ModuleQueue = {};
 	}
 
-	if (TwinkUiState::RenderUi)
+	if (BeginMainMenuBar())
 	{
-		if (BeginMainMenuBar())
+		PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
+
+		if (BeginMenu("$f0fTwinkie##Twinkie"))
 		{
-			PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
-
-			if (BeginMenu("$f0fTwinkie##Twinkie"))
+			if (MenuItem("Include module"))
 			{
-				if (MenuItem("Include module"))
+				if (FilePicker)
 				{
-					if (FilePicker)
-					{
-						delete FilePicker;
-						FilePicker = nullptr;
-					}
+					delete FilePicker;
+					FilePicker = nullptr;
+				}
 
-					FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
-				}
-				if (MenuItem("Settings", "", ShowSettings))
-				{
-					ShowSettings = !ShowSettings;
-				}
-				if (BeginMenu("Modules"))
-				{
-					for (auto& Module : this->Modules)
-					{
-						if (MenuItem(Module->Name, "", Module->Enabled))
-						{
-							Module->Enabled = !Module->Enabled;
-						}
-					}
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenu();
+				FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
 			}
-
-			if (BeginMenu("Modules##Twinkie"))
+			if (MenuItem("Settings", "", ShowSettings))
+			{
+				ShowSettings = !ShowSettings;
+			}
+			if (BeginMenu("Modules"))
 			{
 				for (auto& Module : this->Modules)
 				{
-					if (!Module->Enabled) continue;
-
-					Module->RenderMenu();
+					if (MenuItem(Module->Name, "", Module->Enabled))
+					{
+						Module->Enabled = !Module->Enabled;
+					}
 				}
-
 				ImGui::EndMenu();
 			}
+			ImGui::EndMenu();
+		}
 
+		if (BeginMenu("Modules##Twinkie"))
+		{
 			for (auto& Module : this->Modules)
 			{
 				if (!Module->Enabled) continue;
 
-				Module->RenderMenuMain();
+				Module->RenderMenu();
 			}
 
-			PopItemFlag();
-
-			EndMainMenuBar();
+			ImGui::EndMenu();
 		}
 
-		if (ShowSettings)
+		for (auto& Module : this->Modules)
 		{
-			if (Begin("Settings##Twinkie", &ShowSettings))
-			{
-				Veridian::RenderAll("Twinkie");
-			}
-			End();
+			if (!Module->Enabled) continue;
+
+			Module->RenderMenuMain();
 		}
+
+		PopItemFlag();
+
+		ImGui::EndMainMenuBar();
+	}
+
+	if (ShowSettings)
+	{
+		if (Begin("Settings##Twinkie", &ShowSettings))
+		{
+			Veridian::RenderAll("Twinkie");
+		}
+		End();
 	}
 
 	for (auto& Module : this->Modules)

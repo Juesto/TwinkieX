@@ -78,6 +78,11 @@
 
 #include <Veridian/Veridian.h>
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <DiscordGameSDK/discord.h>
 #undef _CRT_SECURE_NO_WARNINGS

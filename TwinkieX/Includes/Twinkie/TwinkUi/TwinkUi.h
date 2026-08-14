@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Twinkie/TwinkDiscordRP/TwinkDiscordRP.h>
-	
+#include <Twinkie/TwinkIo/TwinkIo.h>
+
 // Modules
 #include <Modules/AppExplorerModule/AppExplorerModule.h>
 #include <Modules/AboutModule/AboutModule.h>
@@ -97,6 +98,9 @@ class TwinkUi
 public:
 	// The Trackmania manager, set by (class Twinkie) to (TrackmaniaMgr Twinkie::TrackmaniaMgr)
 	TwinkTrackmania* TrackmaniaMgr = nullptr;
+
+	// The IO manager
+	TwinkIo IoMgr;
 
 	// The Discord Rich Presence manager, managed by this class
 	TwinkDiscordRP* DiscordMgr = nullptr;

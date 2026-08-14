@@ -851,6 +851,7 @@
     <ClInclude Include="Includes\Twinkie\TwinkDiscordRP\TwinkDiscordRP.h" />
     <ClInclude Include="Includes\Twinkie\TwinkFilePicker\TwinkFilePicker.h" />
     <ClInclude Include="Includes\Twinkie\TwinkFilePicker\TwinkFilePickerExports.h" />
+    <ClInclude Include="Includes\Twinkie\TwinkIo\TwinkIo.h" />
     <ClInclude Include="Includes\Twinkie\TwinkUi\TwinkUi.h" />
     <ClInclude Include="Includes\Utils\Arch.h" />
     <ClInclude Include="framework.h" />
@@ -921,6 +922,7 @@
     <ClCompile Include="Trackmania\TMTypes.cpp" />
     <ClCompile Include="Twinkie\TwinkDiscordRP\TwinkDiscordRP.cpp" />
     <ClCompile Include="Twinkie\Twinkie.cpp" />
+    <ClCompile Include="Twinkie\TwinkIo\TwinkIo.cpp" />
     <ClCompile Include="Twinkie\TwinkTrackmania\TwinkTrackmania.cpp" />
     <ClCompile Include="Twinkie\TwinkUi\TwinkUi.cpp" />
   </ItemGroup>
