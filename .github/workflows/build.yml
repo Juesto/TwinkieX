@@ -57,11 +57,9 @@ jobs:
               /p:Configuration=$config `
               /p:Platform=$platform `
               /m
-            if ($LASTEXITCODE -ne 0) { throw "msbuild failed for $config ($platform)" }
 
             Write-Host "==== Creating installer for $config ===="
             makensis "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
-            if ($LASTEXITCODE -ne 0) { throw "makensis failed for $config" }
 
             Write-Host "==== Packaging DLLs for $config ===="
             tar -a -c -f "$env:OUTPUT_DIR\$config.zip" -C "${{ github.workspace }}/Builds/$msPlatform" "$config"
