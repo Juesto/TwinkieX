@@ -52,16 +52,17 @@ jobs:
             $platform = $c.Platform
             $msPlatform = if ($platform -eq "x86") { "Win32" } else { $platform }
 
-            Write-Host "==== Building $config ($platform) ===="
+            Write-Host "Building $config ($platform)"
             msbuild TwinkieX.sln `
               /p:Configuration=$config `
               /p:Platform=$platform `
               /m
+              if ($LASTEXITCODE -ne 0) { Write-Host "msbuild failed for $config ($platform)" }
 
-            Write-Host "==== Creating installer for $config ===="
-            makensis "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
-
-            Write-Host "==== Packaging DLLs for $config ===="
+            Write-Host "Creating installer for $config"
+            makensis /nonfatal "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
+            
+            Write-Host "Packaging DLLs for $config"
             tar -a -c -f "$env:OUTPUT_DIR\$config.zip" -C "${{ github.workspace }}/Builds/$msPlatform" "$config"
           }
 
