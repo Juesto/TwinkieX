@@ -2,9 +2,7 @@ name: Build merged
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
+
 jobs:
   build:
     runs-on: windows-latest
