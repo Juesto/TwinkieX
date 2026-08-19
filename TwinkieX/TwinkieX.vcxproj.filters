@@ -78,7 +78,7 @@
     <ClInclude Include="Includes\Utils\Stdlibs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Includes\Modules\AppExplorerModule\AppExplorerModule.h">
+    <ClInclude Include="Includes\Modules\NodExplorerModule\NodExplorerModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Includes\TMText\TMText.h">
@@ -224,7 +224,7 @@
     <ClCompile Include="Includes\imgui\imgui_impl_dx11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Includes\Modules\AppExplorerModule\AppExplorerModule.cpp">
+    <ClCompile Include="Includes\Modules\NodExplorerModule\NodExplorerModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Includes\TMText\TMText.cpp">

@@ -841,7 +841,7 @@
     <ClInclude Include="Includes\imgui\imstb_truetype.h" />
     <ClInclude Include="Includes\Modules\AboutModule\AboutModule.h" />
     <ClInclude Include="Includes\Modules\AddictionUnlimiterModule\AddictionUnlimiter.h" />
-    <ClInclude Include="Includes\Modules\AppExplorerModule\AppExplorerModule.h" />
+    <ClInclude Include="Includes\Modules\NodExplorerModule\NodExplorerModule.h" />
     <ClInclude Include="Includes\Modules\IModule.h" />
     <ClInclude Include="Includes\Modules\InputDisplayModule\InputDisplayModule.h" />
     <ClInclude Include="Includes\Modules\VehicleExplorerModule\VehicleExplorerModule.h" />
@@ -891,7 +891,7 @@
     <ClCompile Include="Includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Includes\Modules\AboutModule\AboutModule.cpp" />
     <ClCompile Include="Includes\Modules\AddictionUnlimiterModule\AddictionUnlimiter.cpp" />
-    <ClCompile Include="Includes\Modules\AppExplorerModule\AppExplorerModule.cpp" />
+    <ClCompile Include="Includes\Modules\NodExplorerModule\NodExplorerModule.cpp" />
     <ClCompile Include="Includes\Modules\InputDisplayModule\InputDisplayModule.cpp" />
     <ClCompile Include="Includes\Modules\VehicleExplorerModule\VehicleExplorerModule.cpp" />
     <ClCompile Include="Includes\TMText\ImGuiTMText.cpp" />

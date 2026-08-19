@@ -24,6 +24,7 @@ extern const char* g_MemberTypeSignatures[];
 
 // Used to write to the n-th virtual function from an object ptr
 __declspec(noinline) uintptr_t VirtualWrite(unsigned int Idx, uintptr_t This, uintptr_t ToWrite);
+__declspec(noinline) bool IsAddrSafeSlow(uintptr_t Addr);
 
 // Offsets
 // Unset values must be zero, unless stated that they are set

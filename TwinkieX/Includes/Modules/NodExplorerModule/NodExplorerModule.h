@@ -36,7 +36,7 @@ struct PopupMemberInfo
 	PopupMemberInfo(const std::string Name) : Name(Name) {}
 };
 
-class AppExplorerModule : public IModule
+class NodExplorerModule : public IModule
 {
 	// Window visible
 	bool Visible = false;
@@ -57,14 +57,14 @@ class AppExplorerModule : public IModule
 	bool HasSetWindowPositionForPopup = false;
 
 public:
-	AppExplorerModule(TwinkTrackmania& Twinkie)
+	NodExplorerModule(TwinkTrackmania& Twinkie)
 	{
 		this->Twinkie = &Twinkie;
-		this->Name = "AppExplorer";
-		this->ID = "AppExplorer";
+		this->Name = "NodExplorer";
+		this->ID = "NodExplorer";
 	};
 
-	virtual ~AppExplorerModule() = default;
+	virtual ~NodExplorerModule() = default;
 
 	virtual void RenderInterface() override;
 	virtual void RenderMenu() override;

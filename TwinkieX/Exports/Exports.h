@@ -8,4 +8,3 @@ using ModuleCreateFn = IModule * (*)(TwinkTrackmania*, ImGuiContext*);
 extern Twinkie gTwinkie;
 
 extern __declspec(dllexport) void AddModuleToQueue(ModuleCreateFn CreateModuleFn);
-extern __declspec(dllexport) void ThisFunctionDoesNothing();

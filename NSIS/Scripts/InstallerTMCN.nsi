@@ -16,6 +16,8 @@ Section ""
     SetOutPath $INSTDIR
     File "..\..\Builds\x64\TMCN\TwinkieTMCN.dll"
     File "..\..\Builds\x64\TMCN\dinput8.dll"
+    File "..\..\Builds\x64\TMCN\TwinkieTMCN.pdb"
+    File "..\..\Builds\x64\TMCN\dinput8.pdb"
     File "..\ReleaseDeps\TMCN\discord_game_sdk.dll"
     SetOutPath "$DOCUMENTS\TwinkieX\"
     File /r "..\ReleaseDeps\DocumentsFolder\Fonts"

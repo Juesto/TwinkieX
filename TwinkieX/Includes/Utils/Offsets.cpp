@@ -1309,3 +1309,19 @@ uintptr_t VirtualWrite(unsigned int Idx, uintptr_t This, uintptr_t ToWrite)
 
     return PrevValue;
 }
+
+#pragma optimize("", off)
+bool IsAddrSafeSlow(uintptr_t Addr)
+{
+    __try
+    {
+        [[maybe_unused]] uint8_t Temp = *((uint8_t*)Addr);
+
+        return true;
+    }
+    __except (1)
+    {
+        return false;
+    }
+}
+#pragma optimize("", on)

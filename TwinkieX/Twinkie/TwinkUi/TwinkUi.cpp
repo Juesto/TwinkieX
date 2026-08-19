@@ -88,7 +88,7 @@ __declspec(noinline) TwinkUi::TwinkUi(TwinkTrackmania& TrackmaniaMgr)
 
 	this->DiscordMgr = new TwinkDiscordRP(TrackmaniaMgr);
 
-	this->Modules.push_back(new AppExplorerModule(TrackmaniaMgr));
+	this->Modules.push_back(new NodExplorerModule(TrackmaniaMgr));
 	this->Modules.push_back(new AboutModule(TrackmaniaMgr));
 	this->Modules.push_back(new InputDisplayModule(TrackmaniaMgr));
 #ifdef TMCN
@@ -220,7 +220,7 @@ static LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			if (SUCCEEDED(TwinkUiState::Device->GetSwapChain(0, &pSwapChain)))
 			{
 				D3DPRESENT_PARAMETERS d3dpp = {};
-				if (SUCCEEDED(pSwapChain->GetGetPresentParameters(&d3dpp)))
+				if (SUCCEEDED(pSwapChain->GetPresentParameters(&d3dpp)))
 				{
 					d3dpp.BackBufferWidth = TwinkUiState::WindowWidth;
 					d3dpp.BackBufferHeight = TwinkUiState::WindowHeight;
@@ -525,8 +525,6 @@ void TwinkUi::Render()
 		TwinkUiState::RenderUi = !TwinkUiState::RenderUi;
 	}
 
-	if (!TwinkUiState::RenderUi) return;
-
 	if (Font) PushFont(Font, GetStyle().FontSizeBase * UiScale);
 
 	if (not ModuleQueue.empty())
@@ -539,62 +537,65 @@ void TwinkUi::Render()
 		ModuleQueue = {};
 	}
 
-	if (BeginMainMenuBar())
+	if (TwinkUiState::RenderUi)
 	{
-		PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
-
-		if (BeginMenu("$f0fTwinkie##Twinkie"))
+		if (BeginMainMenuBar())
 		{
-			if (MenuItem("Include module"))
-			{
-				if (FilePicker)
-				{
-					delete FilePicker;
-					FilePicker = nullptr;
-				}
+			PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
 
-				FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
-			}
-			if (MenuItem("Settings", "", ShowSettings))
+			if (BeginMenu("$f0fTwinkie##Twinkie"))
 			{
-				ShowSettings = !ShowSettings;
-			}
-			if (BeginMenu("Modules"))
-			{
-				for (auto& Module : this->Modules)
+				if (MenuItem("Include module"))
 				{
-					if (MenuItem(Module->Name, "", Module->Enabled))
+					if (FilePicker)
 					{
-						Module->Enabled = !Module->Enabled;
+						delete FilePicker;
+						FilePicker = nullptr;
 					}
+
+					FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
+				}
+				if (MenuItem("Settings", "", ShowSettings))
+				{
+					ShowSettings = !ShowSettings;
+				}
+				if (BeginMenu("Modules"))
+				{
+					for (auto& Module : this->Modules)
+					{
+						if (MenuItem(Module->Name, "", Module->Enabled))
+						{
+							Module->Enabled = !Module->Enabled;
+						}
+					}
+					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();
-		}
 
-		if (BeginMenu("Modules##Twinkie"))
-		{
+			if (BeginMenu("Modules##Twinkie"))
+			{
+				for (auto& Module : this->Modules)
+				{
+					if (!Module->Enabled) continue;
+
+					Module->RenderMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
 			for (auto& Module : this->Modules)
 			{
 				if (!Module->Enabled) continue;
 
-				Module->RenderMenu();
+				Module->RenderMenuMain();
 			}
 
-			ImGui::EndMenu();
+			PopItemFlag();
+
+			ImGui::EndMainMenuBar();
 		}
-
-		for (auto& Module : this->Modules)
-		{
-			if (!Module->Enabled) continue;
-
-			Module->RenderMenuMain();
-		}
-
-		PopItemFlag();
-
-		ImGui::EndMainMenuBar();
 	}
 
 	if (ShowSettings)

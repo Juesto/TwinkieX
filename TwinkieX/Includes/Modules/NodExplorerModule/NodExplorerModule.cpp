@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "AppExplorerModule.h"
+#include "NodExplorerModule.h"
 #include <format>
 
 #define HasRightClickedOnItem() IsMouseClicked(ImGuiMouseButton_Right) and IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)
@@ -20,7 +20,7 @@ constexpr bool IsMemberClassAdjacent(CMwMemberInfo* Member)
 
 using namespace ImGui;
 
-void AppExplorerModule::SetMemberInfoPopup(CMwMemberInfo* MemberInfo, const std::string NodName, CMwNod* Nod, CMwClassInfo* ClassInfo, bool IsNodImpersistent)
+void NodExplorerModule::SetMemberInfoPopup(CMwMemberInfo* MemberInfo, const std::string NodName, CMwNod* Nod, CMwClassInfo* ClassInfo, bool IsNodImpersistent)
 {
 	// Fix memory leak incase of user clicking on another member while pop-up is still active
 	if (ChildInfo)
@@ -50,7 +50,7 @@ void AppExplorerModule::SetMemberInfoPopup(CMwMemberInfo* MemberInfo, const std:
 	HasSetWindowPositionForPopup = false;
 }
 
-void AppExplorerModule::SetClassInfoPopup(CMwClassInfo* ClassInfo, const std::string NodName, CMwNod* Nod, bool IsNodImpersistent)
+void NodExplorerModule::SetClassInfoPopup(CMwClassInfo* ClassInfo, const std::string NodName, CMwNod* Nod, bool IsNodImpersistent)
 {
 	// Fix memory leak incase of user clicking on another nod while pop-up is still active
 	if (NodInfo)
@@ -74,7 +74,7 @@ void AppExplorerModule::SetClassInfoPopup(CMwClassInfo* ClassInfo, const std::st
 	HasSetWindowPositionForPopup = false;
 }
 
-std::string AppExplorerModule::GetFancyMemberName(CMwMemberInfo* MemberInfo)
+std::string NodExplorerModule::GetFancyMemberName(CMwMemberInfo* MemberInfo)
 {
 	std::string MemberNameFallback = MemberInfo->MemberName;
 
@@ -91,7 +91,7 @@ std::string AppExplorerModule::GetFancyMemberName(CMwMemberInfo* MemberInfo)
 	return FancyMemberName;
 }
 
-void AppExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMemberInfo* NodMemberInfo = nullptr)
+void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMemberInfo* NodMemberInfo = nullptr)
 {
 	bool IsNodVirtual = false;
 	if (NodMemberInfo) IsNodVirtual = NodMemberInfo->MemberOffset == 0xFFFFFFFFU;
@@ -457,15 +457,15 @@ RerenderMember:
 	PopID();
 }
 
-void AppExplorerModule::RenderMenu()
+void NodExplorerModule::RenderMenu()
 {
-	if (MenuItem("AppExplorer", nullptr, Visible))
+	if (MenuItem("NodExplorer", nullptr, Visible))
 	{
 		Visible = !Visible;
 	}
 }
 
-void AppExplorerModule::RenderNodInfoClassInfo(CMwClassInfo* ClassInfo)
+void NodExplorerModule::RenderNodInfoClassInfo(CMwClassInfo* ClassInfo)
 {
 	{
 		std::string Copyable = std::format("{:p}", (void*)NodInfo->Nod);
@@ -502,7 +502,7 @@ void AppExplorerModule::RenderNodInfoClassInfo(CMwClassInfo* ClassInfo)
 	}
 }
 
-void AppExplorerModule::RenderNodInfoMemberInfo()
+void NodExplorerModule::RenderNodInfoMemberInfo()
 {
 	CMwMemberInfo* MemberInfo = ChildInfo->MemberInfo;
 	{
@@ -561,19 +561,67 @@ void AppExplorerModule::RenderNodInfoMemberInfo()
 	}
 }
 
-void AppExplorerModule::RenderInterface()
+void NodExplorerModule::RenderInterface()
 {
+	static struct
+	{
+		uintptr_t Addr = 0;
+		bool IsSafe = false;
+	} OtherNod;
+
 	if (!Visible) return;
 
-	Begin("AppExplorer");
+	Begin("NodExplorer");
 
-	RenderNod(Twinkie->GetApp(), "App");
+	BeginTabBar("NodExplorerTabBar");
+
+	if (BeginTabItem("App", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+	{
+		RenderNod(Twinkie->GetApp(), "App");
+		EndTabItem();
+	}
+	
+	if (BeginTabItem("Other", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+	{
+		static uint64_t Temp = 0;
+		InputScalar("Address", ImGuiDataType_U64, &Temp, nullptr, nullptr, "%x");
+		SameLine();
+		if (Button(">"))
+		{
+			bool PtrSafe = false;
+			bool VftableSafe = false;
+
+			PtrSafe = IsAddrSafeSlow(Temp);
+			if (PtrSafe) VftableSafe = IsAddrSafeSlow(*(uintptr_t*)Temp);
+
+			bool IsSafe = PtrSafe and VftableSafe;
+
+			if (OtherNod.IsSafe and not IsSafe)
+			{
+				// do nothing...
+			}
+			else if (IsSafe)
+			{
+				OtherNod.Addr = Temp;
+				OtherNod.IsSafe = IsSafe;
+			}
+		}
+
+		if (OtherNod.IsSafe)
+		{
+			RenderNod((CMwNod*)OtherNod.Addr, "Other");
+		}
+
+		EndTabItem();
+	}
+
+	EndTabBar();
 
 	End();
 
 	if (NodInfoPopup)
 	{
-		Begin("##AppExplorerNodInfoPopup", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+		Begin("##NodExplorerNodInfoPopup", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (!IsWindowFocused())
 		{
@@ -610,7 +658,7 @@ void AppExplorerModule::RenderInterface()
 	}
 	else if (MemberInfoPopup)
 	{
-		Begin("##AppExplorerMemberInfoPopup", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+		Begin("##NodExplorerMemberInfoPopup", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (!IsWindowFocused())
 		{

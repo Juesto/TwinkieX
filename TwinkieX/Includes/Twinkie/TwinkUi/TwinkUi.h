@@ -4,7 +4,7 @@
 #include <Twinkie/TwinkIo/TwinkIo.h>
 
 // Modules
-#include <Modules/AppExplorerModule/AppExplorerModule.h>
+#include <Modules/NodExplorerModule/NodExplorerModule.h>
 #include <Modules/AboutModule/AboutModule.h>
 #include <Modules/InputDisplayModule/InputDisplayModule.h>
 #ifdef TMCN

@@ -18,7 +18,7 @@ HRESULT WINAPI hkGetDeviceData(IDirectInputDevice8* pDevice, DWORD cbObjectSize,
 
 void TwinkIo::Sync()
 {
-    if (ImGui::GetCurrentContext() != nullptr && TwinkUiState::RenderUi)
+    if (ImGui::GetCurrentContext() != nullptr)
     {
         ImGuiIO& io = ImGui::GetIO();
         TwinkIoState::BlockKeyboard.store(io.WantCaptureKeyboard, std::memory_order_relaxed);
@@ -68,7 +68,7 @@ HRESULT WINAPI hkGetDeviceState(IDirectInputDevice8* pDevice, DWORD cbData, LPVO
 
     if (SUCCEEDED(hr) && TwinkUiState::RenderUi)
     {
-        if (ImGui::GetIO().WantCaptureKeyboard)
+        if (ImGui::GetIO().WantCaptureKeyboard or ImGui::GetIO().WantCaptureMouse)
         {
             ZeroMemory(lpvData, cbData);
         }
@@ -82,7 +82,7 @@ HRESULT WINAPI hkGetDeviceData(IDirectInputDevice8* pDevice, DWORD cbObjectSize,
 
     if (SUCCEEDED(hr) && pdwInOut && *pdwInOut > 0)
     {
-        if (TwinkIoState::BlockKeyboard.load(std::memory_order_relaxed))
+        if (TwinkIoState::BlockKeyboard.load(std::memory_order_relaxed) or TwinkIoState::BlockMouse.load(std::memory_order_relaxed))
         {
             if ((dwFlags & DIGDD_PEEK) == 0)
             {
