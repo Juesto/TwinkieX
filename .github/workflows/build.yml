@@ -58,7 +58,7 @@ jobs:
               if ($LASTEXITCODE -ne 0) { Write-Host "msbuild failed for $config ($platform)" }
 
             Write-Host "Creating installer for $config"
-            makensis /nonfatal "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
+            makensis "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
             }
 
       - name: Upload Artifacts
