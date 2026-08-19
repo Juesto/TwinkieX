@@ -61,10 +61,7 @@ jobs:
 
             Write-Host "Creating installer for $config"
             makensis /nonfatal "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
-            
-            Write-Host "Packaging DLLs for $config"
-            tar -a -c -f "$env:OUTPUT_DIR\$config.zip" -C "${{ github.workspace }}/Builds/$msPlatform" "$config"
-          }
+            }
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
