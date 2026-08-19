@@ -1,4 +1,4 @@
-name: Build
+name: Build merged
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     tags:
       - '*'
 jobs:
-  build:
+  build-single:
     runs-on: windows-latest
     env:
       OUTPUT_DIR: ${{ github.workspace }}\NSIS\Scripts\Output
