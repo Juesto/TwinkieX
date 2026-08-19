@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      OUTPUT_DIR: ${{ github.workspace }}\NSIS\Scripts\Output
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore file timestamps
+        uses: chetan/git-restore-mtime-action@v2
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install NSIS
+        uses: negrutiu/nsis-install@v2
+
+      - name: Cache intermediate files
+        uses: actions/cache@v4
+        with:
+          path: Intermediates
+          key: ${{ runner.os }}-msbuild-all-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-msbuild-all-
+
+      - name: Build Project
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:OUTPUT_DIR" | Out-Null
+
+          $configs = @(
+            @{ Config = "TMCN";  Platform = "x64" },
+            @{ Config = "ESWC";  Platform = "x86" },
+            @{ Config = "TMU";   Platform = "x86" },
+            @{ Config = "TMO";   Platform = "x86" },
+            @{ Config = "TMSX";  Platform = "x86" },
+            @{ Config = "TM1";   Platform = "x86" }
+          )
+
+          foreach ($c in $configs) {
+            $config   = $c.Config
+            $platform = $c.Platform
+            $msPlatform = if ($platform -eq "x86") { "Win32" } else { $platform }
+
+            Write-Host "Building $config ($platform)"
+            msbuild TwinkieX.sln `
+              /p:Configuration=$config `
+              /p:Platform=$platform `
+              /m
+              if ($LASTEXITCODE -ne 0) { Write-Host "msbuild failed for $config ($platform)" }
+
+            Write-Host "Creating installer for $config"
+            makensis /nonfatal "${{ github.workspace }}/NSIS/Scripts/Installer$config.nsi"
+            }
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Installers
+          path: ${{ env.OUTPUT_DIR }}/*
