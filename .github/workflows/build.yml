@@ -6,7 +6,7 @@ on:
     tags:
       - '*'
 jobs:
-  build-single:
+  build:
     runs-on: windows-latest
     env:
       OUTPUT_DIR: ${{ github.workspace }}\NSIS\Scripts\Output
