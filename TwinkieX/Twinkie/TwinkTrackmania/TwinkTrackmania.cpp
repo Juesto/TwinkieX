@@ -27,6 +27,124 @@ TwinkTrackmania::~TwinkTrackmania()
 
 // Getters
 
+uintptr_t TwinkTrackmania::SigScan(const char* Sig)
+{
+	__pragma(pack(push, 1))
+	struct OptionU8
+	{
+		bool IsWildcard;
+		uint8_t Byte;
+		
+		bool operator==(uint8_t Rhs)
+		{
+			if (IsWildcard) return true;
+			return Rhs == Byte;
+		}
+	};
+	__pragma(pack(pop))
+
+	std::vector<OptionU8> SigBytes;
+	std::string SigStr = Sig;
+	std::string Byte;
+
+	for (auto& Char : SigStr)
+	{
+		if (Char == ' ')
+		{
+			if (Byte[0] == '?')
+			{
+				SigBytes.push_back({ true, 0 });
+			}
+			else
+			{
+				SigBytes.push_back({ false, (uint8_t)std::stoi(Byte, nullptr, 16) });
+			}
+			Byte = "";
+		}
+		else
+		{
+			Byte += Char;
+		}
+	}
+
+	if (Byte[0] == '?')
+	{
+		SigBytes.push_back({ true, 0 });
+	}
+	else
+	{
+		SigBytes.push_back({ false, (uint8_t)std::stoi(Byte, nullptr, 16) });
+	}
+
+	uintptr_t Start = this->ExeBaseAddr;
+
+	// https://wiki.alliedmods.net/Signature_Scanning
+	MEMORY_BASIC_INFORMATION Mbi;
+
+	if (!VirtualQuery((const void*)Start, &Mbi, sizeof(Mbi)))
+		return 0;
+
+	IMAGE_DOS_HEADER* DosHeader = (IMAGE_DOS_HEADER*)Mbi.AllocationBase;
+
+#ifdef X64
+#define NtHeadersStruct IMAGE_NT_HEADERS64
+#else
+#define NtHeadersStruct IMAGE_NT_HEADERS
+#endif
+
+	NtHeadersStruct* PeHeader = (NtHeadersStruct*)((uintptr_t)DosHeader + (uintptr_t)DosHeader->e_lfanew);
+
+	uintptr_t ImageSize = (uintptr_t)PeHeader->OptionalHeader.SizeOfImage;
+	uintptr_t End = Start + ImageSize;
+	
+	uintptr_t Current = Start;
+
+	uint32_t FirstFourBytesOfSig =
+		((uint32_t)SigBytes[0].Byte << 0 ) |
+		((uint32_t)SigBytes[1].Byte << 8 ) |
+		((uint32_t)SigBytes[2].Byte << 16) |
+		((uint32_t)SigBytes[3].Byte << 24) ;
+
+	bool MatchedFirstFourBytes = false;
+
+	while (Current + SigBytes.size() <= End)
+	{
+		while (Current + SigBytes.size() <= End)
+		{
+			if (ReadAddr(uint32_t, Current) == FirstFourBytesOfSig)
+			{
+				MatchedFirstFourBytes = true;
+				break;
+			}
+			Current++;
+		}
+
+		if (MatchedFirstFourBytes)
+		{
+			uintptr_t CurrentForSearch = Current + sizeof(uint32_t);
+			while (CurrentForSearch - Current < SigBytes.size())
+			{
+				size_t Idx = CurrentForSearch - Current;
+				if (ReadAddr(uint8_t, CurrentForSearch) != SigBytes[Idx])
+				{
+					Current++;
+					MatchedFirstFourBytes = false;
+					break;
+				}
+				CurrentForSearch++;
+			}
+
+		}
+		
+		if (MatchedFirstFourBytes)
+		{
+			return Current;
+		}
+	}
+
+	return 0;
+}
+
 CMwNod* TwinkTrackmania::GetApp()
 {
 #ifndef TM1
