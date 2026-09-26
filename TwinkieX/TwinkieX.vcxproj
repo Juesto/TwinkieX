@@ -208,6 +208,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -809,6 +810,63 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Exports\Exports.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\autowrapper\aswrappedcall.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\contextmgr\contextmgr.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\datetime\datetime.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\debugger\debugger.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptany\scriptany.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptarray\scriptarray.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptdictionary\scriptdictionary.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfile.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfilesystem.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptgrid\scriptgrid.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scripthandle\scripthandle.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scripthelper\scripthelper.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmath.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmathcomplex.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptsocket\scriptsocket.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\serializer\serializer.h" />
+    <ClInclude Include="Includes\angelscript\sdk\add_on\weakref\weakref.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\include\angelscript.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_array.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_atomic.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_builder.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_bytecode.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_callfunc.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_compiler.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_config.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_configgroup.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_context.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_criticalsection.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_datatype.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_debug.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_gc.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_generic.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_map.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_memory.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_module.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_namespace.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_objecttype.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_outputbuffer.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_parser.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_property.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_restore.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptcode.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptengine.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptfunction.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptnode.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptobject.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_string.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_string_util.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_symboltable.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_texts.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_thread.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_tokendef.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_tokenizer.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_typeinfo.h" />
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_variablescope.h" />
     <ClInclude Include="Includes\DiscordGameSDK\achievement_manager.h" />
     <ClInclude Include="Includes\DiscordGameSDK\activity_manager.h" />
     <ClInclude Include="Includes\DiscordGameSDK\application_manager.h" />
@@ -828,6 +886,12 @@
     <ClInclude Include="Includes\DiscordGameSDK\types.h" />
     <ClInclude Include="Includes\DiscordGameSDK\user_manager.h" />
     <ClInclude Include="Includes\DiscordGameSDK\voice_manager.h" />
+    <ClInclude Include="Includes\Gecko\CtxSet.h" />
+    <ClInclude Include="Includes\Gecko\Exports\Global\Global.h" />
+    <ClInclude Include="Includes\Gecko\Exports\Trackmania\Trackmania.h" />
+    <ClInclude Include="Includes\Gecko\Gecko.h" />
+    <ClInclude Include="Includes\Gecko\Script.h" />
+    <ClInclude Include="Includes\Gecko\ScriptManager.h" />
     <ClInclude Include="Includes\GlyphTable\IconsForkAwesome.h" />
     <ClInclude Include="Includes\GlyphTable\IconsKenney.h" />
     <ClInclude Include="Includes\imgui\imconfig.h" />
@@ -854,11 +918,11 @@
     <ClInclude Include="Includes\Twinkie\TwinkIo\TwinkIo.h" />
     <ClInclude Include="Includes\Twinkie\TwinkUi\TwinkUi.h" />
     <ClInclude Include="Includes\Utils\Arch.h" />
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="Includes\framework.h" />
     <ClInclude Include="Includes\Utils\Stdlibs.h" />
     <ClInclude Include="Includes\Veridian\Veridian.h" />
     <ClInclude Include="Includes\Version.h" />
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="Includes\pch.h" />
     <ClInclude Include="Includes\Utils\Offsets.h" />
     <ClInclude Include="Includes\Twinkie\Twinkie.h" />
     <ClInclude Include="Includes\Twinkie\TwinkTrackmania\TwinkTrackmania.h" />
@@ -866,6 +930,55 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Exports\Exports.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\contextmgr\contextmgr.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\datetime\datetime.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\debugger\debugger.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptany\scriptany.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptarray\scriptarray.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptdictionary\scriptdictionary.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfile.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfilesystem.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptgrid\scriptgrid.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scripthandle\scripthandle.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scripthelper\scripthelper.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmath.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmathcomplex.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptsocket\scriptsocket.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring_utils.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\serializer\serializer.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\add_on\weakref\weakref.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_atomic.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_builder.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_bytecode.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x64_msvc.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x86.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_compiler.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_configgroup.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_context.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_datatype.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_gc.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_generic.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_globalproperty.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_memory.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_module.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_objecttype.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_outputbuffer.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_parser.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_restore.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptcode.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptengine.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptfunction.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptnode.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptobject.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_string.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_string_util.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_thread.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_tokenizer.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_typeinfo.cpp" />
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_variablescope.cpp" />
     <ClCompile Include="Includes\DiscordGameSDK\achievement_manager.cpp" />
     <ClCompile Include="Includes\DiscordGameSDK\activity_manager.cpp" />
     <ClCompile Include="Includes\DiscordGameSDK\application_manager.cpp" />
@@ -881,6 +994,12 @@
     <ClCompile Include="Includes\DiscordGameSDK\types.cpp" />
     <ClCompile Include="Includes\DiscordGameSDK\user_manager.cpp" />
     <ClCompile Include="Includes\DiscordGameSDK\voice_manager.cpp" />
+    <ClCompile Include="Includes\Gecko\CtxSet.cpp" />
+    <ClCompile Include="Includes\Gecko\Exports\Global\Global.cpp" />
+    <ClCompile Include="Includes\Gecko\Exports\Trackmania\Trackmania.cpp" />
+    <ClCompile Include="Includes\Gecko\Gecko.cpp" />
+    <ClCompile Include="Includes\Gecko\Script.cpp" />
+    <ClCompile Include="Includes\Gecko\ScriptManager.cpp" />
     <ClCompile Include="Includes\imgui\imgui.cpp" />
     <ClCompile Include="Includes\imgui\imgui_demo.cpp" />
     <ClCompile Include="Includes\imgui\imgui_draw.cpp" />
@@ -899,7 +1018,7 @@
     <ClCompile Include="Twinkie\TwinkFilePicker\TwinkFilePicker.cpp" />
     <ClCompile Include="Includes\Utils\Offsets.cpp" />
     <ClCompile Include="Includes\Veridian\Veridian.cpp" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="Includes\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -927,6 +1046,9 @@
     <ClCompile Include="Twinkie\TwinkUi\TwinkUi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x64_msvc_asm.asm">
+      <FileType>Document</FileType>
+    </MASM>
     <None Include="Includes\DiscordGameSDK\x64\discord_game_sdk.dll" />
     <None Include="Includes\DiscordGameSDK\x86\discord_game_sdk.dll" />
     <None Include="Includes\README.md" />
@@ -935,5 +1057,6 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

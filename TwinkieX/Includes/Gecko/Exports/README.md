@@ -1,0 +1,1 @@
+Contains definitions of global functions/classes to be later exported from C++ to Angelscript.

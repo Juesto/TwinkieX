@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="Includes\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="Includes\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Includes\Utils\Arch.h">
@@ -177,12 +177,201 @@
     <ClInclude Include="Includes\Twinkie\TwinkIo\TwinkIo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\autowrapper\aswrappedcall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\contextmgr\contextmgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\datetime\datetime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\debugger\debugger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptany\scriptany.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptarray\scriptarray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptdictionary\scriptdictionary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfilesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptgrid\scriptgrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scripthandle\scripthandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scripthelper\scripthelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmathcomplex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptsocket\scriptsocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\serializer\serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\add_on\weakref\weakref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\include\angelscript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_atomic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_bytecode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_callfunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_configgroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_criticalsection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_datatype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_gc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_generic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_namespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_objecttype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_outputbuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_restore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptengine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptfunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptnode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_scriptobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_string_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_symboltable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_texts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_tokendef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_tokenizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_typeinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\angelscript\sdk\angelscript\source\as_variablescope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\Exports\Global\Global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\Exports\Trackmania\Trackmania.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\CtxSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\Gecko.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\Script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Gecko\ScriptManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="Includes\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Twinkie\Twinkie.cpp">
@@ -305,6 +494,171 @@
     <ClCompile Include="Twinkie\TwinkIo\TwinkIo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\contextmgr\contextmgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\datetime\datetime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\debugger\debugger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptany\scriptany.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptarray\scriptarray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptbuilder\scriptbuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptdictionary\scriptdictionary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptfile\scriptfilesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptgrid\scriptgrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scripthandle\scripthandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scripthelper\scripthelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptmath\scriptmathcomplex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptsocket\scriptsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\scriptstdstring\scriptstdstring_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\serializer\serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\add_on\weakref\weakref.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_atomic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_bytecode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x64_msvc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x86.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_compiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_configgroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_datatype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_gc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_generic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_globalproperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_module.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_objecttype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_outputbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_restore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptcode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptfunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptnode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_scriptobject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_string_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_tokenizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_typeinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\angelscript\sdk\angelscript\source\as_variablescope.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\Exports\Global\Global.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\Exports\Trackmania\Trackmania.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\CtxSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\Gecko.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\Script.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Gecko\ScriptManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\README.md" />
@@ -312,5 +666,10 @@
     <None Include="Includes\Veridian\Veridian.vcxproj" />
     <None Include="Includes\DiscordGameSDK\x64\discord_game_sdk.dll" />
     <None Include="Includes\DiscordGameSDK\x86\discord_game_sdk.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="Includes\angelscript\sdk\angelscript\source\as_callfunc_x64_msvc_asm.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

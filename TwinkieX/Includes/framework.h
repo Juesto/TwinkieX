@@ -86,3 +86,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <DiscordGameSDK/discord.h>
 #undef _CRT_SECURE_NO_WARNINGS
+
+#include <angelscript/sdk/angelscript/include/angelscript.h>
+#include <angelscript/sdk/add_on/scriptbuilder/scriptbuilder.h>
+#include <angelscript/sdk/add_on/scriptstdstring/scriptstdstring.h>
+#include <chrono>
+
+using namespace std::chrono_literals;

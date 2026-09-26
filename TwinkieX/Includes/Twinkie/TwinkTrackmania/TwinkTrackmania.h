@@ -34,7 +34,7 @@ public:
 	// Getters
 
 	// Scans for a specific signature (sigscan) in the .exe.
-	// The signature MUST have at least 4 bytes, all non-wildcard (i.e. not ?).
+	// The signature MUST have at least 4 bytes, and the first 4 bytes must NOT be a wildcard.
 	uintptr_t SigScan(const char* Sig);
 
 	// Gets the main app object, usually defined as (CTrackMania*).
