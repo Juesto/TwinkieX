@@ -2,7 +2,7 @@
 
 #pragma warning(disable : 4464) // ".." in include path
 #pragma warning(push)
-#include "../pch.h"
+#include "pch.h"
 #pragma warning(pop)
 #include <filesystem>
 
