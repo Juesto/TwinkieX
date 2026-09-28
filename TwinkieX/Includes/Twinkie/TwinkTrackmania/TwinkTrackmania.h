@@ -49,6 +49,9 @@ public:
 	// Gets the game's input port, for mouse and keyboard events (always CDx8InputPort or similar)
 	__declspec(noinline) CInputPort* GetInputPort();
 
+	// Gets the engine manager that contains all classes
+	__declspec(noinline) CMwEngineManager* GetEngineManager();
+
 #ifdef GAMEBOX
 	// Sees if the intro when launching the game is over or not. Only for GAMEBOX
 	__declspec(noinline) bool GetIsIntroOver();

@@ -177,6 +177,11 @@ CInputPort* TwinkTrackmania::GetInputPort()
 	return ReadAddr(CInputPort*, (uintptr_t)GetApp() + O_M_CTRACKMANIA_INPUTPORT);
 }
 
+CMwEngineManager* TwinkTrackmania::GetEngineManager()
+{
+	return (CMwEngineManager*)(this->ExeBaseAddr + O_ENGINEMGR);
+}
+
 #ifdef GAMEBOX
 bool TwinkTrackmania::GetIsIntroOver()
 {
@@ -193,6 +198,8 @@ uintptr_t TwinkTrackmania::GetDirectXSwapChain()
 {
 	return ReadAddr(uintptr_t, (uintptr_t)this->GetViewport() + O_M_CDX11VIEWPORT_D3DSWAPCHAIN);
 }
+
+
 #endif
 
 #pragma optimize("", off)

@@ -1,18 +1,24 @@
 // Precompiled headers.
 #include "pch.h"
 
-// Includes class definitions for the Twinkie class, used by (Twinkie gTwinkie).
+// Includes class definitions for the Twinkie class, used by (Twinkie gTwinkie).freopen_s((FILE**)stdout, "CONOUT$", "wb", stdout);
 #include <Twinkie/Twinkie.h>
 #include <DiscordGameSDK/DiscordStuff.h>
+#include <Gecko/Gecko.h>
 
 // The global Twinkie object, used to manage all other managers.
 Twinkie gTwinkie;
 
 // Behaviors
 
-// Ctor and initializer, also registers some settings for TwinkUi
+// Ctor and initializer, also registers some settinfreopen_s((FILE**)stdout, "CONOUT$", "wb", stdout);gs for TwinkUi
 Twinkie::Twinkie()
 {
+#ifndef NDEBUG
+	AllocConsole();
+	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+#endif
+
 	UiMgr = new TwinkUi(TrackmaniaMgr);
 
 	wchar_t* Buffer = nullptr;
@@ -55,6 +61,7 @@ Twinkie::~Twinkie()
 	if (not TwinkUiState::ImGuiInit) return;
 
 	delete UiMgr;
+	delete Gecko::TheScriptManager;
 
 #ifdef MANIAPLANET
 	ImGui_ImplDX11_Shutdown();
@@ -76,6 +83,17 @@ Twinkie::~Twinkie()
 
 void Twinkie::Update()
 {
+	Gecko::TheScriptManager = new Gecko::ScriptManager();
+
+	for (const auto& File : std::filesystem::directory_iterator(DocumentsFolderPath / "TwinkieX\\Scripts"))
+	{
+		if (File.path().extension() != ".as") continue;
+
+		Gecko::TheScriptManager->AddFromFile(File.path());
+	}
+
+	Gecko::TheScriptManager->BuildAll();
+
 	this->UiMgr->Update(DocumentsFolderPath);
 }
 

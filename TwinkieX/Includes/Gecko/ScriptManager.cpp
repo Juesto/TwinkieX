@@ -3,10 +3,11 @@
 
 #include "Exports/Global/Global.h"
 #include "Exports/Trackmania/Trackmania.h"
+#include "Exports/imgui/ExportImgui.h"
 
 namespace Gecko
 {
-	ScriptManager TheScriptManager;
+	ScriptManager* TheScriptManager = nullptr;
 
 	// Must be synced with CallbackType
 	const char* CallbackTypeSignatures[] =
@@ -42,8 +43,18 @@ namespace Gecko
 		if (std::chrono::system_clock::now() >= *Timeout)
 		{
 			Ctx->Suspend();
-			TheScriptManager.Scripts[TheScriptManager.ActiveScriptIdx].Enabled = false;
+			TheScriptManager->Scripts[TheScriptManager->ActiveScriptIdx].Enabled = false;
 		}
+	}
+
+	void MessageCallback(const asSMessageInfo* msg, void* param)
+	{
+		const char* type = "ERR ";
+		if (msg->type == asMSGTYPE_WARNING)
+			type = "WARN";
+		else if (msg->type == asMSGTYPE_INFORMATION)
+			type = "INFO";
+		printf("%s (%d, %d) : %s : %s\n", msg->section, msg->row, msg->col, type, msg->message);
 	}
 
 	static std::u8string FromStr(const std::string& that)
@@ -53,8 +64,11 @@ namespace Gecko
 
 	ScriptManager::ScriptManager()
 	{
+		Engine->SetMessageCallback(asFUNCTION(MessageCallback), nullptr, asCALL_CDECL);
+
 		Exports::Global::Registrar(Engine);
 		Exports::Trackmania::Registrar(Engine);
+		Exports::ImGui::Registrar(Engine);
 	}
 
 	ScriptManager::~ScriptManager()
@@ -68,6 +82,7 @@ namespace Gecko
 
 		// Exports::Global::Cleanup();
 		Exports::Trackmania::Cleanup();
+		// Exports::ImGui::Cleanup();
 	}
 
 	void ScriptManager::BuildScriptByCallback(Script& Script, CallbackType CallbackType)

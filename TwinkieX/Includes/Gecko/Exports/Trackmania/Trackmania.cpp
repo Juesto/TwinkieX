@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "Trackmania.h"
+#include <Twinkie/Twinkie.h>
 
 #undef GetObject
+#undef RegisterClass
 
 namespace Gecko::Exports::Trackmania
 {
+	std::map<uint32_t, CMwClassInfo*> ClassIDToInfo;
+
 	static void CMwNod_AddRef(CMwNod* Nod)
 	{
 		Nod->ReferenceCount++;
@@ -14,6 +18,13 @@ namespace Gecko::Exports::Trackmania
 	{
 		Nod->ReferenceCount--;
 		if (!Nod->ReferenceCount) Nod->~CMwNod();
+	}
+
+	static CMwNod* GetApp()
+	{
+		CMwNod* App = ReadAddr(CMwNod*, (uintptr_t)GetModuleHandleA(NULL) + O_APP);
+		App->ReferenceCount++;
+		return App;
 	}
 
 	void Caster(asIScriptGeneric* Script)
@@ -36,6 +47,11 @@ namespace Gecko::Exports::Trackmania
 		Script->SetReturnAddress(nullptr);
 	}
 
+	void VirtualGetAs(asIScriptGeneric* Script)
+	{
+		// TODO
+	}
+
 	void CasterNonPersistent(asIScriptGeneric* Script)
 	{
 		Script->SetReturnAddress(nullptr);
@@ -43,77 +59,121 @@ namespace Gecko::Exports::Trackmania
 
 	static inline void RegisterClass(asIScriptEngine* Engine, CMwClassInfo* Class)
 	{
-		Engine->RegisterObjectType(Class->ClassName, 0, asOBJ_REF);
+		if (Engine->GetTypeInfoByName(Class->GetName().c_str())) return;
+		ClassIDToInfo[Class->ClassID] = Class;
+		std::cout << "Registered " << Class->GetName() << "\n";
+		Engine->RegisterObjectType(Class->GetName().c_str(), 0, asOBJ_REF);
 
-		if (Class->CtorFn) Engine->RegisterObjectBehaviour(Class->ClassName, asBEHAVE_FACTORY, (Class->ClassName + std::string("@ f()")).c_str(), (uintptr_t)Class->CtorFn, asCALL_CDECL);
-		Engine->RegisterObjectBehaviour(Class->ClassName, asBEHAVE_ADDREF, "void f()", asFUNCTION(CMwNod_AddRef), asCALL_CDECL_OBJFIRST);
-		Engine->RegisterObjectBehaviour(Class->ClassName, asBEHAVE_RELEASE, "void f()", asFUNCTION(CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
+		if (Class->CtorFn) Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_FACTORY, (Class->GetName() + std::string("@ f()")).c_str(), (uintptr_t)Class->CtorFn, asCALL_CDECL);
+		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_ADDREF, "void f()", asFUNCTION(CMwNod_AddRef), asCALL_CDECL_OBJFIRST);
+		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_RELEASE, "void f()", asFUNCTION(CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
 	}
 
 	void Registrar(asIScriptEngine* Engine)
 	{
-		/*for (uint32_t ClassIdx = 0; ClassIdx < ClassesAmount; ClassIdx++)
-		{
-			CMwClassInfo* Class = AvailableClasses[ClassIdx];
+		CMwEngineManager* EngineMgr = gTwinkie.TrackmaniaMgr.GetEngineManager();
 
-			if (!Engine->GetTypeInfoByName(Class->ClassName))
+		for (auto& TmEngine : EngineMgr->Engines)
+		{
+			if (!TmEngine) continue;
+
+			for (auto& Class : TmEngine->Classes)
 			{
+				if (!Class) continue;
+
 				RegisterClass(Engine, Class);
 			}
 		}
-		for (uint32_t ClassIdx = 0; ClassIdx < ClassesAmount; ClassIdx++)
+		for (auto& TmEngine : EngineMgr->Engines)
 		{
-			CMwClassInfo* Class = AvailableClasses[ClassIdx];
+			if (!TmEngine) continue;
 
-			CMwClassInfo* Parent = Class;
-			while (Parent)
+			for (auto& Class : TmEngine->Classes)
 			{
-				for (uint32_t MemberIdx = 0; MemberIdx < Parent->MembersAmount; MemberIdx++)
-				{
-					CMwMemberInfo* Member = Parent->Members[MemberIdx];
+				if (!Class) continue;
 
-					Engine->RegisterObjectProperty(Class->ClassName, std::format("int {}", Member->MemberName).c_str(), Member->MemberOffset);
+				CMwClassInfo* Parent = Class;
+				while (Parent)
+				{
+					for (uint32_t MemberIdx = 0; MemberIdx < Parent->MembersAmount; MemberIdx++)
+					{
+						CMwMemberInfo* Member = Parent->Members[MemberIdx];
+
+						if (auto TypeInfo = Engine->GetTypeInfoByName(Class->GetName().c_str()))
+						{
+							bool SkipMember = false;
+							for (uint32_t AsMemberIdx = 0; AsMemberIdx < TypeInfo->GetPropertyCount(); AsMemberIdx++)
+							{
+								const char* AsMemberName = nullptr;
+								TypeInfo->GetProperty(AsMemberIdx, &AsMemberName);
+
+								if (strcmp(AsMemberName, Member->GetName().c_str()) == 0)
+								{
+									SkipMember = true;
+									break;
+								}
+							}
+							if (SkipMember) continue;
+						}
+
+						// TODO: Add other types.
+						if (Member->MemberOffset <= 32767 && Member->MemberType == CMwMemberInfo::CLASS) 
+							Engine->RegisterObjectProperty(
+								Class->GetName().c_str(), 
+								std::format(
+									"{}@ {}", 
+									((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
+								).c_str(), 
+								Member->MemberOffset
+							);
+					}
+					Parent = Parent->ParentClassInfo;
 				}
-				Parent = Parent->ParentClassInfo;
 			}
 		}
-		for (uint32_t ClassIdx = 0; ClassIdx < ClassesAmount; ClassIdx++)
+		for (auto& TmEngine : EngineMgr->Engines)
 		{
-			CMwClassInfo* Class = AvailableClasses[ClassIdx];
+			if (!TmEngine) continue;
 
-			if (!Class) continue;
-
-			CMwClassInfo* Parent = Class->ParentClassInfo;
-			while (Parent)
+			for (auto& Class : TmEngine->Classes)
 			{
-				Engine->RegisterObjectMethod(
-					Parent->ClassName,
-					std::format(
-						"{}@ opCast()",
-						Class->ClassName
-					).c_str(),
-					asFUNCTION(Caster),
-					asCALL_GENERIC,
-					Class
-				);
+				if (!Class) continue;
 
-				Engine->RegisterObjectMethod(
-					Class->ClassName,
-					std::format(
-						"{}@ opCast()",
-						Parent->ClassName
-					).c_str(),
-					asFUNCTION(Caster),
-					asCALL_GENERIC,
-					Parent
-				);
+				CMwClassInfo* Parent = Class->ParentClassInfo;
+				while (Parent)
+				{
+					Engine->RegisterObjectMethod(
+						Parent->GetName().c_str(),
+						std::format(
+							"{}@ opCast()",
+							Class->GetName()
+						).c_str(),
+						asFUNCTION(Caster),
+						asCALL_GENERIC,
+						Class
+					);
 
-				Parent = Parent->ParentClassInfo;
+					Engine->RegisterObjectMethod(
+						Class->GetName().c_str(),
+						std::format(
+							"{}@ opCast()",
+							Parent->GetName()
+						).c_str(),
+						asFUNCTION(Caster),
+						asCALL_GENERIC,
+						Parent
+					);
+
+					Parent = Parent->ParentClassInfo;
+				}
 			}
-		}*/
+		}
+
+		Engine->RegisterGlobalFunction("CGameApp@ GetApp()", asFUNCTION(GetApp), asCALL_CDECL);
 	}
 
 	void Cleanup()
 	{
+		GetApp()->ReferenceCount--;
 	}
 }
