@@ -84,5 +84,5 @@ namespace Gecko
 		bool AddFromSource(std::u8string Source, std::u8string ScriptName);
 	};
 
-	extern ScriptManager TheScriptManager;
+	extern ScriptManager* TheScriptManager;
 }

@@ -156,6 +156,8 @@ struct CMwMemberInfo
 		MAX = 512
 	};
 
+	std::string GetName() const;
+
 	enum eFlags 
 	{
 		GET = 0b00000001,
@@ -241,6 +243,8 @@ struct CMwClassInfo
 	CMwMemberInfo** begin() const;
 	// Const iterator function for the end of the members array
 	CMwMemberInfo** end() const;
+
+	std::string GetName() const;
 
 	uint32_t Pad0;
 };
@@ -445,6 +449,8 @@ struct CMwMemberInfo
 		VIRTUAL_ADD = 0b01000000,
 		VIRTUAL_SUB = 0b10000000,
 	};
+
+	std::string GetName() const;
 
 	// Type of the member
 	eType MemberType;
@@ -673,6 +679,27 @@ public:
 	Item*    m_pExtraItems;        
 #endif
 };
+
+#ifdef TMCN
+class CMwEngineInfo
+{
+public:
+	virtual ~CMwEngineInfo() {}
+
+	uint32_t EngineID;
+	char* EngineName;
+	uint32_t ClassesAmount; // ?? Classes already has this info
+	CFastArray<CMwClassInfo*> Classes;
+};
+
+class CMwEngineManager
+{
+public:
+	virtual ~CMwEngineManager() {}
+
+	CFastArray<CMwEngineInfo*> Engines;
+};
+#endif
 
 #ifdef TMCN
 template <typename WantedType>

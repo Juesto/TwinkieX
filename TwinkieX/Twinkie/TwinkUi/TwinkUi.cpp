@@ -22,6 +22,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 // Discord
 #include <DiscordGameSDK/DiscordStuff.h>
 
+// Gecko, the angelscript scripting engine
+#include <Gecko/Gecko.h>
+
 // Namespace
 
 namespace TwinkUiState
@@ -595,6 +598,8 @@ void TwinkUi::Render()
 			PopItemFlag();
 
 			ImGui::EndMainMenuBar();
+
+			Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Render);
 		}
 	}
 

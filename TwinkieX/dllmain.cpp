@@ -8,6 +8,8 @@
 
 #include "Exports/Exports.h"
 
+#define WaitUntilPause() Sleep(1); if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie
+
 // This is a separate thread that runs when the DLL is attached.
 // It is used to initialize all hooks for the global Twinkie object (Twinkie gTwinkie).
 static DWORD WINAPI InitializerThread([[maybe_unused]] LPVOID lpParameter)
@@ -18,33 +20,28 @@ static DWORD WINAPI InitializerThread([[maybe_unused]] LPVOID lpParameter)
     // While the game is not initialized, wait
     while (!gTwinkie.TrackmaniaMgr.GetApp())
     {
-        Sleep(1);
-        if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie;
+        WaitUntilPause();
     }
     while (!gTwinkie.TrackmaniaMgr.GetViewport())
     {
-        Sleep(1);
-        if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie;
+        WaitUntilPause();
     }
 #ifdef MANIAPLANET
     while (!gTwinkie.TrackmaniaMgr.GetDirectXSwapChain())
     {
-        Sleep(1);
-        if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie;
+        WaitUntilPause();
     }
 #else
     while (!gTwinkie.TrackmaniaMgr.GetDirectXDevice())
     {
-        Sleep(1);
-        if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie;
+        WaitUntilPause();
     }
 #endif
 #ifdef GAMEBOX
     // Nothing is set up properly when the intro is running, so wait
     while (!gTwinkie.TrackmaniaMgr.GetIsIntroOver())
     {
-        Sleep(1);
-        if (GetAsyncKeyState(VK_PAUSE) < 0) goto NoCreateTwinkie;
+        WaitUntilPause();
     }
 #endif
     

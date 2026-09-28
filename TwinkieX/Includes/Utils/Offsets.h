@@ -34,6 +34,7 @@ __declspec(noinline) bool IsAddrSafeSlow(uintptr_t Addr);
 // Globals
 #define O_APP 0x1C7AB90
 #define O_D3DDEVICE 0x1C7AB20
+#define O_ENGINEMGR 0x1c89e08
 
 // Offsets to members
 #define O_M_CTRACKMANIA_VIEWPORT 96

@@ -5757,7 +5757,7 @@ void asCWriter::SListAdjuster::SetNextType(int typeId)
 {
 	// Make sure the list is expecting a type at this location
 	asASSERT( patternNode->type == asLPT_TYPE &&
-	          reinterpret_cast<asSListPatternDataTypeNode*>(patternNode)->dataType.GetTokenType() == ttQuestion );
+	          static_cast<asSListPatternDataTypeNode*>(patternNode)->dataType.GetTokenType() == ttQuestion );
 
 	// Inform the type id for the next adjustment
 	nextTypeId = typeId;
