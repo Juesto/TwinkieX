@@ -10,6 +10,6 @@ namespace Gecko::Exports::Global
 	// void print(const string&in);
 	void print(std::string&);
 
-	// NOT AN ANGELSCRIPT FUNCTION. Registers all globals with an engine.
+	// Registers all globals with an engine.
 	void Registrar(asIScriptEngine*);
 }

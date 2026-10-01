@@ -514,6 +514,8 @@ struct CMwClassInfo
 	CMwMemberInfo** begin() const;
 	// Const iterator function for the end of the members array
 	CMwMemberInfo** end() const;
+
+	std::string GetName() const;
 };
 
 
@@ -680,7 +682,6 @@ public:
 #endif
 };
 
-#ifdef TMCN
 class CMwEngineInfo
 {
 public:
@@ -688,8 +689,15 @@ public:
 
 	uint32_t EngineID;
 	char* EngineName;
+#ifdef GAMEBOX
+	uint32_t Padding;
+#endif
 	uint32_t ClassesAmount; // ?? Classes already has this info
+#ifdef TMCN
 	CFastArray<CMwClassInfo*> Classes;
+#else
+	CMwClassInfo** Classes;
+#endif
 };
 
 class CMwEngineManager
@@ -697,9 +705,13 @@ class CMwEngineManager
 public:
 	virtual ~CMwEngineManager() {}
 
+#ifdef GAMEBOX
+	uint32_t Padding;
+	uint32_t Padding2;
+#endif
+
 	CFastArray<CMwEngineInfo*> Engines;
 };
-#endif
 
 #ifdef TMCN
 template <typename WantedType>

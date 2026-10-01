@@ -64,7 +64,10 @@ namespace Gecko
 
 	ScriptManager::ScriptManager()
 	{
+		Engine->SetEngineProperty(asEP_PROPERTY_ACCESSOR_MODE, 2);
+#ifndef NDEBUG
 		Engine->SetMessageCallback(asFUNCTION(MessageCallback), nullptr, asCALL_CDECL);
+#endif
 
 		Exports::Global::Registrar(Engine);
 		Exports::Trackmania::Registrar(Engine);

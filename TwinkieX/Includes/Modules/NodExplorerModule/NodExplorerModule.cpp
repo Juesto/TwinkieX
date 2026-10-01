@@ -334,7 +334,7 @@ void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMem
 					case CMwMemberInfo::REALRANGE:
 #endif
 #ifdef TMU
-					// oh god
+					// TODO: oh god
 					case CMwMemberInfo::IDBUFFERCAT:
 #endif
 					case CMwMemberInfo::REAL:
