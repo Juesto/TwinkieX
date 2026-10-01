@@ -22,6 +22,8 @@ extern const char* g_MemberTypeSignatures[];
 // Unprotects memory at address with size
 #define Unprotect(addr, size) VirtualProtect((void*)(addr), (size), PAGE_EXECUTE_READWRITE, &ProtFlags)
 
+#define OffsetOf(Class, member) (uintptr_t)&(((Class*)(0))->Member)
+
 // Used to write to the n-th virtual function from an object ptr
 __declspec(noinline) uintptr_t VirtualWrite(unsigned int Idx, uintptr_t This, uintptr_t ToWrite);
 __declspec(noinline) bool IsAddrSafeSlow(uintptr_t Addr);

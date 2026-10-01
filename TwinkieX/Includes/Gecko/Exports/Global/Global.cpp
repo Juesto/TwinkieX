@@ -16,14 +16,17 @@ namespace Gecko::Exports::Global
 		if (For) yield();
 	}
 
-	void print(std::string& Str)
+	void print([[maybe_unused]] std::string& Str)
 	{
+#ifdef _DEBUG
 		std::cout << "[AS] " << Str << '\n';
+#endif
 	}
 
 	void Registrar(asIScriptEngine* Engine)
 	{
 		RegisterStdString(Engine);
+		RegisterScriptArray(Engine, true);
 
 		Engine->RegisterGlobalFunction("void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
 		Engine->RegisterGlobalFunction("void yield()", asFUNCTION(yield), asCALL_CDECL);

@@ -90,6 +90,7 @@
 #include <angelscript/sdk/angelscript/include/angelscript.h>
 #include <angelscript/sdk/add_on/scriptbuilder/scriptbuilder.h>
 #include <angelscript/sdk/add_on/scriptstdstring/scriptstdstring.h>
+#include <angelscript/sdk/add_on/scriptarray/scriptarray.h>
 #include <chrono>
 
 using namespace std::chrono_literals;
