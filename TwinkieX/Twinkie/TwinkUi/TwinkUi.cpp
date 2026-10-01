@@ -102,6 +102,8 @@ __declspec(noinline) TwinkUi::TwinkUi(TwinkTrackmania& TrackmaniaMgr)
 
 __declspec(noinline) TwinkUi::~TwinkUi()
 {
+	delete Veridian::VastVeridian;
+
 	for (auto& Module : Modules)
 	{
 		delete Module;
@@ -114,8 +116,6 @@ __declspec(noinline) TwinkUi::~TwinkUi()
 	delete DiscordMgr;
 
 	if (FilePicker) delete FilePicker;
-
-	delete Veridian::VastVeridian;
 }
 
 // END Behaviors
@@ -521,6 +521,8 @@ void TwinkUi::Render()
 {
 	using namespace ImGui;
 
+	static uint8_t OffsetAsScriptRun = 0;
+
 	IoMgr.Sync();
 
 	if (IsKeyPressed(ImGuiKey_F3, false))
@@ -598,8 +600,6 @@ void TwinkUi::Render()
 			PopItemFlag();
 
 			ImGui::EndMainMenuBar();
-
-			Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Render);
 		}
 	}
 
@@ -618,6 +618,13 @@ void TwinkUi::Render()
 
 		Module->Render();
 		if (TwinkUiState::RenderUi) Module->RenderInterface();
+	}
+
+	if (OffsetAsScriptRun < 255)
+		OffsetAsScriptRun++;
+	else
+	{
+		Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Render);
 	}
 
 	if (Font) PopFont();

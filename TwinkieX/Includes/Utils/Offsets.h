@@ -167,10 +167,11 @@ __declspec(noinline) bool IsAddrSafeSlow(uintptr_t Addr);
 #elif defined(TMU)
 
 // Globals
-#define O_APP 0x8292C4
+#define O_APP 0x82CD60
 #define O_D3DDEVICE 0x8237AC
 // TMU has no intro
 #define O_ISINTROOVER 0x0
+#define O_ENGINEMGR 0x826C5C
 
 // Offsets to members
 #define O_M_CTRACKMANIA_VIEWPORT 0

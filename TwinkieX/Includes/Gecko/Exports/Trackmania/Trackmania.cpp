@@ -7,20 +7,20 @@
 
 namespace Gecko::Exports::Trackmania
 {
-	std::map<uint32_t, CMwClassInfo*> ClassIDToInfo;
+	std::unordered_map<uint32_t, CMwClassInfo*> ClassIDToInfo;
 
-	static void CMwNod_AddRef(CMwNod* Nod)
+	static void __cdecl CMwNod_AddRef(CMwNod* Nod)
 	{
 		Nod->ReferenceCount++;
 	}
 
-	static void CMwNod_RemoveRef(CMwNod* Nod)
+	static void __cdecl CMwNod_RemoveRef(CMwNod* Nod)
 	{
 		Nod->ReferenceCount--;
-		if (!Nod->ReferenceCount) Nod->~CMwNod();
 	}
 
-	static CMwNod* GetApp()
+	// CGameApp@ GetApp()
+	static CMwNod* __stdcall GetApp()
 	{
 		CMwNod* App = ReadAddr(CMwNod*, (uintptr_t)GetModuleHandleA(NULL) + O_APP);
 		App->ReferenceCount++;
@@ -49,7 +49,14 @@ namespace Gecko::Exports::Trackmania
 
 	void VirtualGetAs(asIScriptGeneric* Script)
 	{
-		// TODO
+		CMwNod* Nod = (CMwNod*)Script->GetObject();
+		CMwMemberInfo* Member = (CMwMemberInfo*)Script->GetAuxiliary();
+
+		// TODO: Add other types.
+		if (Member->MemberType == CMwMemberInfo::CLASS)
+		{
+			Script->SetReturnAddress(gTwinkie.TrackmaniaMgr.ParamGet<CMwNod*>(Nod, Member));
+		}
 	}
 
 	void CasterNonPersistent(asIScriptGeneric* Script)
@@ -71,14 +78,23 @@ namespace Gecko::Exports::Trackmania
 
 	void Registrar(asIScriptEngine* Engine)
 	{
+		gTwinkie.TrackmaniaMgr.GetApp()->ReferenceCount++;
+
 		CMwEngineManager* EngineMgr = gTwinkie.TrackmaniaMgr.GetEngineManager();
 
 		for (auto& TmEngine : EngineMgr->Engines)
 		{
 			if (!TmEngine) continue;
 
+#ifdef GAMEBOX
+			for (uint32_t ClassIdx = 0; ClassIdx < TmEngine->ClassesAmount; ClassIdx++)
+#else
 			for (auto& Class : TmEngine->Classes)
+#endif
 			{
+#ifdef GAMEBOX
+				auto Class = TmEngine->Classes[ClassIdx];
+#endif
 				if (!Class) continue;
 
 				RegisterClass(Engine, Class);
@@ -88,8 +104,15 @@ namespace Gecko::Exports::Trackmania
 		{
 			if (!TmEngine) continue;
 
+#ifdef GAMEBOX
+			for (uint32_t ClassIdx = 0; ClassIdx < TmEngine->ClassesAmount; ClassIdx++)
+#else
 			for (auto& Class : TmEngine->Classes)
+#endif
 			{
+#ifdef GAMEBOX
+				auto Class = TmEngine->Classes[ClassIdx];
+#endif
 				if (!Class) continue;
 
 				CMwClassInfo* Parent = Class;
@@ -117,15 +140,29 @@ namespace Gecko::Exports::Trackmania
 						}
 
 						// TODO: Add other types.
-						if (Member->MemberOffset <= 32767 && Member->MemberType == CMwMemberInfo::CLASS) 
+						if (Member->MemberOffset <= 32767 && Member->MemberType == CMwMemberInfo::CLASS)
 							Engine->RegisterObjectProperty(
-								Class->GetName().c_str(), 
+								Class->GetName().c_str(),
 								std::format(
-									"{}@ {}", 
+									"{}@ {}",
 									((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
-								).c_str(), 
+								).c_str(),
 								Member->MemberOffset
 							);
+							
+						else if (Member->MemberOffset > 32767 && Member->MemberType == CMwMemberInfo::CLASS)
+							Engine->RegisterObjectMethod(
+								Class->GetName().c_str(),
+								std::format(
+									"{}@ get_{}() property",
+									((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
+								).c_str(),
+								asFUNCTION(VirtualGetAs),
+								asCALL_GENERIC,
+								Member
+							);
+
+						std::cout << "Registered " << Member->GetName() << " for " << Class->GetName() << "\n";
 					}
 					Parent = Parent->ParentClassInfo;
 				}
@@ -135,8 +172,15 @@ namespace Gecko::Exports::Trackmania
 		{
 			if (!TmEngine) continue;
 
+#ifdef GAMEBOX
+			for (uint32_t ClassIdx = 0; ClassIdx < TmEngine->ClassesAmount; ClassIdx++)
+#else
 			for (auto& Class : TmEngine->Classes)
+#endif
 			{
+#ifdef GAMEBOX
+				auto Class = TmEngine->Classes[ClassIdx];
+#endif
 				if (!Class) continue;
 
 				CMwClassInfo* Parent = Class->ParentClassInfo;
@@ -169,7 +213,7 @@ namespace Gecko::Exports::Trackmania
 			}
 		}
 
-		Engine->RegisterGlobalFunction("CGameApp@ GetApp()", asFUNCTION(GetApp), asCALL_CDECL);
+		Engine->RegisterGlobalFunction("CGameApp@ GetApp()", asFUNCTION(GetApp), asCALL_STDCALL);
 	}
 
 	void Cleanup()
