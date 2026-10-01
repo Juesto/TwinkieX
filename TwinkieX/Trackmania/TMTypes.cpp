@@ -31,7 +31,7 @@ std::string CMwClassInfo::GetName() const
 	for (size_t Pos; (Pos = TheClassName.find("::")) != std::string::npos;)
 		TheClassName.replace(Pos, 2, "_");
 
-	if (TheClassName.empty()) return std::format("__0x{:08x}", this->ClassID);
+	if (TheClassName.empty()) return std::format("__{:08X}", this->ClassID);
 	else return TheClassName;
 }
 
@@ -46,6 +46,6 @@ std::string CMwMemberInfo::GetName() const
 	for (size_t Pos; (Pos = TheMemberName.find(' ')) != std::string::npos;)
 		TheMemberName.replace(Pos, 1, "_");
 
-	if (TheMemberName.empty()) return std::format("__0x{:08x}", this->MemberID);
+	if (TheMemberName.empty()) return std::format("__{:08X}", this->MemberID);
 	else return TheMemberName;
 }

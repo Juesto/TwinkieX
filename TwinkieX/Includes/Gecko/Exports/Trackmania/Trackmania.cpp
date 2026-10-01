@@ -8,6 +8,7 @@
 namespace Gecko::Exports::Trackmania
 {
 	std::unordered_map<uint32_t, CMwClassInfo*> ClassIDToInfo;
+	std::unordered_map<std::string, CMwClassInfo*> ClassNameToInfo;
 
 	static void __cdecl CMwNod_AddRef(CMwNod* Nod)
 	{
@@ -68,7 +69,10 @@ namespace Gecko::Exports::Trackmania
 	{
 		if (Engine->GetTypeInfoByName(Class->GetName().c_str())) return;
 		ClassIDToInfo[Class->ClassID] = Class;
+		ClassNameToInfo[Class->GetName()] = Class;
+#ifdef _DEBUG
 		std::cout << "Registered " << Class->GetName() << "\n";
+#endif
 		Engine->RegisterObjectType(Class->GetName().c_str(), 0, asOBJ_REF);
 
 		if (Class->CtorFn) Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_FACTORY, (Class->GetName() + std::string("@ f()")).c_str(), (uintptr_t)Class->CtorFn, asCALL_CDECL);
@@ -76,8 +80,56 @@ namespace Gecko::Exports::Trackmania
 		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_RELEASE, "void f()", asFUNCTION(CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
 	}
 
+	static void RegisterMemberNormal(asIScriptEngine* Engine, CMwClassInfo* Class, CMwMemberInfo* Member)
+	{
+		using enum CMwMemberInfo::eType;
+
+		switch (Member->MemberType)
+		{
+		case CLASS:
+		{
+			Engine->RegisterObjectProperty(
+				Class->GetName().c_str(),
+				std::format(
+					"{}@ {}",
+					((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
+				).c_str(),
+				Member->MemberOffset
+			);
+			break;
+		}
+		case BOOL:
+		case INT:
+		case NATURAL:
+		case REAL:
+		case ENUM:
+		case COLOR:
+		case VEC2:
+		case VEC3:
+		case VEC4:
+		case ISO4:
+		{
+			Engine->RegisterObjectProperty(
+				Class->GetName().c_str(),
+				std::format(
+					"{} {}",
+					g_MemberTypeSignatures[Member->MemberType], 
+					Member->GetName()
+				).c_str(),
+				Member->MemberOffset
+			);
+			break;
+		}
+		default:
+		{
+			break;
+		}
+		}
+	}
+
 	void Registrar(asIScriptEngine* Engine)
 	{
+		((void)&RegisterMemberNormal);
 		gTwinkie.TrackmaniaMgr.GetApp()->ReferenceCount++;
 
 		CMwEngineManager* EngineMgr = gTwinkie.TrackmaniaMgr.GetEngineManager();
@@ -161,8 +213,9 @@ namespace Gecko::Exports::Trackmania
 								asCALL_GENERIC,
 								Member
 							);
-
+#ifdef _DEBUG
 						std::cout << "Registered " << Member->GetName() << " for " << Class->GetName() << "\n";
+#endif
 					}
 					Parent = Parent->ParentClassInfo;
 				}
@@ -184,6 +237,8 @@ namespace Gecko::Exports::Trackmania
 				if (!Class) continue;
 
 				CMwClassInfo* Parent = Class->ParentClassInfo;
+				bool HasMwNodParent = false;
+				Parent = Class->ParentClassInfo;
 				while (Parent)
 				{
 					Engine->RegisterObjectMethod(
@@ -203,6 +258,28 @@ namespace Gecko::Exports::Trackmania
 							"{}@ opCast()",
 							Parent->GetName()
 						).c_str(),
+						asFUNCTION(Caster),
+						asCALL_GENERIC,
+						Parent
+					);
+
+					if (Parent->GetName() == "CMwNod")
+						HasMwNodParent = true;
+
+					Parent = Parent->ParentClassInfo;
+				}
+				Parent = Class->ParentClassInfo;
+				while (Parent && HasMwNodParent)
+				{
+					if (Engine->GetTypeInfoByDecl(Class->GetName().c_str())->GetMethodByDecl("CMwNod@ opImplCast()"))
+					{
+						Parent = Parent->ParentClassInfo;
+						continue;
+					}
+
+					Engine->RegisterObjectMethod(
+						Class->GetName().c_str(),
+						"CMwNod@ opImplCast()",
 						asFUNCTION(Caster),
 						asCALL_GENERIC,
 						Parent

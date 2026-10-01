@@ -4,6 +4,7 @@
 #include "Exports/Global/Global.h"
 #include "Exports/Trackmania/Trackmania.h"
 #include "Exports/imgui/ExportImgui.h"
+#include "Exports/Reflection/Reflection.h"
 
 namespace Gecko
 {
@@ -65,13 +66,14 @@ namespace Gecko
 	ScriptManager::ScriptManager()
 	{
 		Engine->SetEngineProperty(asEP_PROPERTY_ACCESSOR_MODE, 2);
-#ifndef NDEBUG
+#ifdef _DEBUG
 		Engine->SetMessageCallback(asFUNCTION(MessageCallback), nullptr, asCALL_CDECL);
 #endif
 
-		Exports::Global::Registrar(Engine);
 		Exports::Trackmania::Registrar(Engine);
+		Exports::Global::Registrar(Engine);
 		Exports::ImGui::Registrar(Engine);
+		Exports::Reflection::Registrar(Engine);
 	}
 
 	ScriptManager::~ScriptManager()
@@ -83,9 +85,10 @@ namespace Gecko
 
 		Engine->ShutDownAndRelease();
 
-		// Exports::Global::Cleanup();
 		Exports::Trackmania::Cleanup();
+		// Exports::Global::Cleanup();
 		// Exports::ImGui::Cleanup();
+		// Exports::Reflection::Cleanup();
 	}
 
 	void ScriptManager::BuildScriptByCallback(Script& Script, CallbackType CallbackType)

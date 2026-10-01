@@ -889,6 +889,7 @@
     <ClInclude Include="Includes\Gecko\CtxSet.h" />
     <ClInclude Include="Includes\Gecko\Exports\Global\Global.h" />
     <ClInclude Include="Includes\Gecko\Exports\imgui\ExportImgui.h" />
+    <ClInclude Include="Includes\Gecko\Exports\Reflection\Reflection.h" />
     <ClInclude Include="Includes\Gecko\Exports\Trackmania\Trackmania.h" />
     <ClInclude Include="Includes\Gecko\Gecko.h" />
     <ClInclude Include="Includes\Gecko\Script.h" />
@@ -998,6 +999,7 @@
     <ClCompile Include="Includes\Gecko\CtxSet.cpp" />
     <ClCompile Include="Includes\Gecko\Exports\Global\Global.cpp" />
     <ClCompile Include="Includes\Gecko\Exports\imgui\ExportImgui.cpp" />
+    <ClCompile Include="Includes\Gecko\Exports\Reflection\Reflection.cpp" />
     <ClCompile Include="Includes\Gecko\Exports\Trackmania\Trackmania.cpp" />
     <ClCompile Include="Includes\Gecko\Gecko.cpp" />
     <ClCompile Include="Includes\Gecko\Script.cpp" />
