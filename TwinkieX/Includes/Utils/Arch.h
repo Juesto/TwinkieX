@@ -8,6 +8,11 @@
 #define X86
 #endif
 
+// Only TMCN is x64
+#if defined(_DEBUG) && defined(X64)
+#define TMCN
+#endif
+
 // TMCN (TrackmaniaChina) is an x64 game
 #if defined(TMCN) and defined(X86)
 #error "TMCN is only supported on x64 architecture."

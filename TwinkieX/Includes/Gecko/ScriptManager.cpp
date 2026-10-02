@@ -161,10 +161,12 @@ namespace Gecko
 				continue;
 			}
 
+#ifndef _DEBUG
 			static std::chrono::time_point<std::chrono::system_clock> When;
 			When = std::chrono::system_clock::now() + TimeoutDurationMs;
 
 			CtxFromCallback->SetLineCallback(asFUNCTION(ScriptCtxLineCallback), &When, asCALL_CDECL);
+#endif
 
 			int r = CtxFromCallback->Execute();
 			if (r != asEXECUTION_FINISHED)

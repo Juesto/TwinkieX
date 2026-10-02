@@ -10,14 +10,64 @@ namespace Gecko::Exports::Trackmania
 	std::unordered_map<uint32_t, CMwClassInfo*> ClassIDToInfo;
 	std::unordered_map<std::string, CMwClassInfo*> ClassNameToInfo;
 
-	static void __cdecl CMwNod_AddRef(CMwNod* Nod)
+	namespace BaseTypes
 	{
-		Nod->ReferenceCount++;
-	}
+		static void __cdecl CMwNod_AddRef(CMwNod* Nod)
+		{
+			Nod->ReferenceCount++;
+		}
 
-	static void __cdecl CMwNod_RemoveRef(CMwNod* Nod)
-	{
-		Nod->ReferenceCount--;
+		static void __cdecl CMwNod_RemoveRef(CMwNod* Nod)
+		{
+			Nod->ReferenceCount--;
+		}
+
+		static uint32_t __cdecl CFastArray_Length(CFastArrayGen* Array)
+		{
+			return Array->Size;
+		}
+
+		static void __cdecl CFastArray_opIndex(asIScriptGeneric* Script)
+		{
+			auto Engine = Script->GetEngine();
+
+			auto ArrayType = Engine->GetTypeInfoById(Script->GetObjectTypeId());
+			auto SubTypeId = ArrayType->GetSubTypeId();
+
+			uint32_t ElemSize = 0xFFFFFFFF;
+			if ((SubTypeId & asTYPEID_MASK_OBJECT) == 0)
+			{
+				ElemSize = Engine->GetSizeOfPrimitiveType(SubTypeId);
+			}
+			else if (SubTypeId & asTYPEID_OBJHANDLE)
+			{
+				ElemSize = sizeof(void*);
+			}
+			else
+			{
+				auto SubType = Engine->GetTypeInfoById(SubTypeId);
+				if (SubType->GetFlags() & asOBJ_VALUE)
+					ElemSize = SubType->GetSize();
+				else
+					ElemSize = sizeof(void*);
+			}
+
+			uint32_t Idx = Script->GetArgDWord(0);
+			CFastArrayGen* Array = (CFastArrayGen*)Script->GetObject();
+
+			if (Idx >= Array->Size) (void)0; // TODO: Raise an exception when OOB
+
+			Script->SetReturnAddress(Array->Get(Idx, ElemSize));
+		}
+
+		// Registers all base types used by the game.
+		static void RegistrarBaseTypes(asIScriptEngine* Engine)
+		{
+			Engine->RegisterObjectType("MwFastArray<T>", 0, asOBJ_REF | asOBJ_NOCOUNT | asOBJ_TEMPLATE);
+			Engine->RegisterObjectMethod("MwFastArray<T>", "const uint get_Length() property", asFUNCTION(CFastArray_Length), asCALL_CDECL_OBJLAST);
+			Engine->RegisterObjectMethod("MwFastArray<T>", "T& opIndex(uint index)", asFUNCTION(CFastArray_opIndex), asCALL_GENERIC);
+			Engine->RegisterObjectMethod("MwFastArray<T>", "const T& opIndex(uint index) const", asFUNCTION(CFastArray_opIndex), asCALL_GENERIC);
+		}
 	}
 
 	// CGameApp@ GetApp()
@@ -39,7 +89,7 @@ namespace Gecko::Exports::Trackmania
 		{
 			if (From->ClassID == To->ClassID)
 			{
-				CMwNod_AddRef(FromNod);
+				BaseTypes::CMwNod_AddRef(FromNod);
 				Script->SetReturnAddress(FromNod);
 				return;
 			}
@@ -70,20 +120,42 @@ namespace Gecko::Exports::Trackmania
 		if (Engine->GetTypeInfoByName(Class->GetName().c_str())) return;
 		ClassIDToInfo[Class->ClassID] = Class;
 		ClassNameToInfo[Class->GetName()] = Class;
-#ifdef _DEBUG
-		std::cout << "Registered " << Class->GetName() << "\n";
-#endif
 		Engine->RegisterObjectType(Class->GetName().c_str(), 0, asOBJ_REF);
 
 		if (Class->CtorFn) Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_FACTORY, (Class->GetName() + std::string("@ f()")).c_str(), (uintptr_t)Class->CtorFn, asCALL_CDECL);
-		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_ADDREF, "void f()", asFUNCTION(CMwNod_AddRef), asCALL_CDECL_OBJFIRST);
-		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_RELEASE, "void f()", asFUNCTION(CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
+		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_ADDREF, "void f()", asFUNCTION(BaseTypes::CMwNod_AddRef), asCALL_CDECL_OBJFIRST);
+		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_RELEASE, "void f()", asFUNCTION(BaseTypes::CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
+	}
+
+	static void RegisterMemberVirtual(asIScriptEngine* Engine, CMwClassInfo* Class, CMwMemberInfo* Member)
+	{
+		using enum CMwMemberInfo::eType;
+
+		// TODO: Add more types.
+		switch (Member->MemberType)
+		{
+		case CLASS:
+			Engine->RegisterObjectMethod(
+				Class->GetName().c_str(),
+				std::format(
+					"{}@ get_{}() property",
+					((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
+				).c_str(),
+				asFUNCTION(VirtualGetAs),
+				asCALL_GENERIC,
+				Member
+			);
+			break;
+		default:
+			break;
+		}
 	}
 
 	static void RegisterMemberNormal(asIScriptEngine* Engine, CMwClassInfo* Class, CMwMemberInfo* Member)
 	{
 		using enum CMwMemberInfo::eType;
 
+		// TODO: Add more types.
 		switch (Member->MemberType)
 		{
 		case CLASS:
@@ -98,16 +170,22 @@ namespace Gecko::Exports::Trackmania
 			);
 			break;
 		}
+		case CLASSARRAY:
+		{
+			Engine->RegisterObjectProperty(
+				Class->GetName().c_str(),
+				std::format(
+					"MwFastArray<{}>@ {}",
+					((CMwMemberInfoClassArray*)Member)->ArrayClassInfo->GetName(), Member->GetName()
+				).c_str(),
+				Member->MemberOffset
+			);
+			break;
+		}
 		case BOOL:
 		case INT:
 		case NATURAL:
 		case REAL:
-		case ENUM:
-		case COLOR:
-		case VEC2:
-		case VEC3:
-		case VEC4:
-		case ISO4:
 		{
 			Engine->RegisterObjectProperty(
 				Class->GetName().c_str(),
@@ -127,9 +205,9 @@ namespace Gecko::Exports::Trackmania
 		}
 	}
 
-	void Registrar(asIScriptEngine* Engine)
+	// Registers all classes available from the engine manager.
+	void RegistrarFromTm(asIScriptEngine* Engine)
 	{
-		((void)&RegisterMemberNormal);
 		gTwinkie.TrackmaniaMgr.GetApp()->ReferenceCount++;
 
 		CMwEngineManager* EngineMgr = gTwinkie.TrackmaniaMgr.GetEngineManager();
@@ -191,31 +269,12 @@ namespace Gecko::Exports::Trackmania
 							if (SkipMember) continue;
 						}
 
-						// TODO: Add other types.
-						if (Member->MemberOffset <= 32767 && Member->MemberType == CMwMemberInfo::CLASS)
-							Engine->RegisterObjectProperty(
-								Class->GetName().c_str(),
-								std::format(
-									"{}@ {}",
-									((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
-								).c_str(),
-								Member->MemberOffset
-							);
-							
-						else if (Member->MemberOffset > 32767 && Member->MemberType == CMwMemberInfo::CLASS)
-							Engine->RegisterObjectMethod(
-								Class->GetName().c_str(),
-								std::format(
-									"{}@ get_{}() property",
-									((CMwMemberInfoClass*)Member)->ClassInfo->GetName(), Member->GetName()
-								).c_str(),
-								asFUNCTION(VirtualGetAs),
-								asCALL_GENERIC,
-								Member
-							);
-#ifdef _DEBUG
-						std::cout << "Registered " << Member->GetName() << " for " << Class->GetName() << "\n";
-#endif
+						// Non-virtual
+						// TODO: Use Member->MemberFlags0/1 to know if to use VirtualGet/Set.
+						if (Member->MemberOffset <= 32767)
+							RegisterMemberNormal(Engine, Class, Member);
+						else
+							RegisterMemberVirtual(Engine, Class, Member);
 					}
 					Parent = Parent->ParentClassInfo;
 				}
@@ -288,7 +347,16 @@ namespace Gecko::Exports::Trackmania
 					Parent = Parent->ParentClassInfo;
 				}
 			}
+#ifdef _DEBUG
+			std::cout << "Registered engine " << TmEngine->EngineName << " (ID 0x" << std::hex << TmEngine->EngineID << std::dec << ")\n";
+#endif
 		}
+	}
+
+	void Registrar(asIScriptEngine* Engine)
+	{
+		BaseTypes::RegistrarBaseTypes(Engine);
+		RegistrarFromTm(Engine);
 
 		Engine->RegisterGlobalFunction("CGameApp@ GetApp()", asFUNCTION(GetApp), asCALL_STDCALL);
 	}

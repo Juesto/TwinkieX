@@ -61,6 +61,22 @@ namespace Gecko::Exports::Reflection
 	{
 		return Class->FileExtName ? "" : Class->FileExtName;
 	}
+
+	std::string Reflection_MwClassInfo_get_Description(CMwClassInfo* Class)
+	{
+		if (Class->Description)
+		{
+			if (*Class->Description)
+			{
+				return *Class->Description;
+			}
+			return "";
+		}
+		else
+		{
+			return "";
+		}
+	}
 #endif
 
 	// Reflection::MwClassInfo@ Reflection::GetType(uint id)
@@ -94,18 +110,19 @@ namespace Gecko::Exports::Reflection
 		Engine->RegisterObjectType("MwMemberInfo", 0, asOBJ_REF | asOBJ_NOCOUNT);
 		Engine->RegisterObjectProperty("MwMemberInfo", "const uint ID", asOFFSET(CMwMemberInfo, MemberID));
 		Engine->RegisterObjectProperty("MwMemberInfo", "const uint16 Offset", asOFFSET(CMwMemberInfo, MemberOffset));
-		Engine->RegisterObjectMethod("MwMemberInfo", "string get_NameDescriptive()", asMETHOD(CMwMemberInfo, GetName), asCALL_THISCALL);
+		Engine->RegisterObjectMethod("MwMemberInfo", "string get_NameDescriptive() property", asMETHOD(CMwMemberInfo, GetName), asCALL_THISCALL);
 
 		Engine->RegisterObjectType("MwClassInfo", 0, asOBJ_REF | asOBJ_NOCOUNT);
 		Engine->RegisterObjectProperty("MwClassInfo", "const uint ID", asOFFSET(CMwClassInfo, ClassID));
 		Engine->RegisterObjectProperty("MwClassInfo", "const MwClassInfo@ BaseType", asOFFSET(CMwClassInfo, ParentClassInfo));
 		Engine->RegisterObjectMethod("MwClassInfo", "MwMemberInfo@ GetMember(const string&in name)", asFUNCTION(Reflection_MwClassInfo_GetMember), asCALL_GENERIC);
-		Engine->RegisterObjectMethod("MwClassInfo", "const MwMemberInfo@[]@ get_Members()", asFUNCTION(Reflection_MwClassInfo_get_Members), asCALL_GENERIC);
-		Engine->RegisterObjectMethod("MwClassInfo", "string get_Name()", asMETHOD(CMwClassInfo, GetName), asCALL_THISCALL);
+		Engine->RegisterObjectMethod("MwClassInfo", "const MwMemberInfo@[]@ get_Members() property", asFUNCTION(Reflection_MwClassInfo_get_Members), asCALL_GENERIC);
+		Engine->RegisterObjectMethod("MwClassInfo", "string get_Name() property", asMETHOD(CMwClassInfo, GetName), asCALL_THISCALL);
 #ifdef MANIAPLANET
-		// TODO: Figure out where size and other stuff goes
-		// Engine->RegisterObjectProperty("MwClassInfo", "uint Size", asOFFSET(CMwClassInfo, Size));
-		Engine->RegisterObjectMethod("MwClassInfo", "string get_FileExtension()", asFUNCTION(Reflection_MwClassInfo_get_FileExtension), asCALL_CDECL_OBJFIRST);
+		// TODO: Figure out where UserName and ChildClasses go in this
+		Engine->RegisterObjectProperty("MwClassInfo", "const uint Size", asOFFSET(CMwClassInfo, Size));
+		Engine->RegisterObjectMethod("MwClassInfo", "string get_FileExtension() property", asFUNCTION(Reflection_MwClassInfo_get_FileExtension), asCALL_CDECL_OBJFIRST);
+		Engine->RegisterObjectMethod("MwClassInfo", "string get_Description() property", asFUNCTION(Reflection_MwClassInfo_get_Description), asCALL_CDECL_OBJFIRST);
 #endif
 
 		Engine->RegisterGlobalFunction("MwClassInfo@ GetType(uint id)", asFUNCTION(Reflection_GetType_ById), asCALL_CDECL);

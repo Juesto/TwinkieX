@@ -9,6 +9,36 @@ using ActionFn = void(
 #endif
 	*)(CMwNod*);
 
+// Resizable non-templated array type, with 32-bit-sized elements, similar to CFastBuffer
+struct CFastBufferGen
+{
+#ifdef TMCN
+	void* Ptr = nullptr;
+	uint32_t Size = 0;
+	uint32_t Capacity = 0;
+#elif defined(GAMEBOX)
+	uint32_t Size = 0;
+	T* Ptr = nullptr;
+	uint32_t Capacity = 0;
+#endif
+
+	void* operator[](size_t Idx)
+	{
+		return (uint32_t*)Ptr + Idx;
+	}
+
+	void* Get(size_t Idx, size_t SizeOfElem)
+	{
+		return &((uint8_t*)Ptr)[Idx * SizeOfElem];
+	}
+
+	void* begin() { return Ptr; }
+	void* end() { return (uint32_t*)Ptr + Size; }
+
+	const void* begin() const { return Ptr; }
+	const void* end() const { return (uint32_t*)Ptr + Size; }
+};
+
 // Resizable array type used by the game
 template <typename T>
 struct CFastBuffer
@@ -33,6 +63,40 @@ struct CFastBuffer
 
 	const T* begin() const { return Ptr; }
 	const T* end() const { return Ptr + Size; }
+
+	operator CFastBufferGen* ()
+	{
+		return reinterpret_cast<CFastBufferGen*>(this);
+	}
+};
+
+// Single-size non-templated 32-bit-size element array type, similar to CFastArray
+struct CFastArrayGen
+{
+#ifdef MANIAPLANET
+	void* Ptr = nullptr;
+	uint32_t Size = 0;
+#else
+	uintptr_t vf;
+	uint32_t Size = 0;
+	void* Ptr = nullptr;
+#endif
+
+	void* operator[](size_t Idx)
+	{
+		return (uint8_t*)Ptr + Idx;
+	}
+
+	void* Get(size_t Idx, size_t SizeOfElem)
+	{
+		return &((uint8_t*)Ptr)[Idx * SizeOfElem];
+	}
+
+	void* begin() { return Ptr; }
+	void* end() { return (uint32_t*)Ptr + Size; }
+
+	const void* begin() const { return Ptr; }
+	const void* end() const { return (uint32_t*)Ptr + Size; }
 };
 
 // Single-size array type used by the game
@@ -48,12 +112,21 @@ struct CFastArray
 	T* Ptr = nullptr;
 #endif
 
+	T* operator[](size_t Idx)
+	{
+		return Ptr + Idx;
+	}
 
 	T* begin() { return Ptr; }
 	T* end() { return Ptr + Size; }
 
 	const T* begin() const { return Ptr; }
 	const T* end() const { return Ptr + Size; }
+
+	operator CFastArrayGen*()
+	{
+		return reinterpret_cast<CFastArrayGen*>(this);
+	}
 };
 
 // Used for parameters to PROCs
@@ -208,7 +281,8 @@ struct CMwClassInfo
 	const char* ClassName;
 
 	uint32_t unknown0;
-	uint32_t unknown1;
+	// Size of the class in bytes
+	uint32_t Size;
 
 	// Class ID
 	uint32_t ClassID;
@@ -224,7 +298,11 @@ struct CMwClassInfo
 	ActionFn CtorFn;
 
 	// Padding for unknown data
-	uint64_t Padding[18];
+	uint64_t Padding[12];
+
+	char** Description;
+
+	uint64_t Padding2[5];
 
 	// File extension for this class
 	char* FileExtName;

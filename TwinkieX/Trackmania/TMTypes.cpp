@@ -39,11 +39,24 @@ std::string CMwMemberInfo::GetName() const
 {
 	std::string TheMemberName = this->MemberName;
 
+	// TODO: Better code PLEASE
 	for (size_t Pos; (Pos = TheMemberName.find("::")) != std::string::npos;)
 		TheMemberName.replace(Pos, 2, "_");
 	for (size_t Pos; (Pos = TheMemberName.find('.')) != std::string::npos;)
 		TheMemberName.replace(Pos, 1, "_");
 	for (size_t Pos; (Pos = TheMemberName.find(' ')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find('[')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find(']')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find('(')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find(')')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find('/')) != std::string::npos;)
+		TheMemberName.replace(Pos, 1, "_");
+	for (size_t Pos; (Pos = TheMemberName.find('%')) != std::string::npos;)
 		TheMemberName.replace(Pos, 1, "_");
 
 	if (TheMemberName.empty()) return std::format("__{:08X}", this->MemberID);
