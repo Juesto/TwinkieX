@@ -13,6 +13,9 @@
 #include <iostream>
 #include <functional>
 
+// For befriending with VSetCtx
+class TwinkUi;
+
 #define VERIDIAN_FALLBACK_SECTION_NAME "FallbackSection"
 
 // The veridian settings manager
@@ -522,6 +525,8 @@ namespace Veridian
     class VSetCtx
     {
     public:
+        friend class ::TwinkUi;
+
         VSetCtx() = delete;
         VSetCtx(std::filesystem::path Filepath);
         VSetCtx(VSetCtx&) = default;
@@ -544,6 +549,8 @@ namespace Veridian
 
     private:
         std::fstream FileStream;
+        
+        void PrepareForDestruction();
     };
 
     // The vast (global) veridian settings manager

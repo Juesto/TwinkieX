@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Veridian.h"
+#include "Twinkie/TwinkUi/TwinkUi.h"
 
 namespace Veridian
 {
@@ -97,7 +98,16 @@ namespace Veridian
                 ExistingSetting.Type = Type;
                 ExistingSetting.SetFromString();
 
-                if (Value and ExistingSetting.Value) memcpy_s(Value, TypeToSize[Type], ExistingSetting.Value, TypeToSize[Type]);
+                if (Value and ExistingSetting.Value)
+                {
+                    if (Type == VSettingType::VString)
+                        *reinterpret_cast<std::string*>(Value) = ExistingSetting.SettingStr;
+                    else
+                        memcpy_s(Value, TypeToSize[Type], ExistingSetting.Value, TypeToSize[Type]);
+                }
+
+                if (Type != VSettingType::VString) delete ExistingSetting.Value;
+                ExistingSetting.Value = nullptr;
             }
         }
 
@@ -117,6 +127,24 @@ namespace Veridian
         NewSettingRef.Value = reinterpret_cast<VValue*>(Value);
 
         return this->SettingValues[Section].Values[Name];
+    }
+
+    void VSetCtx::PrepareForDestruction()
+    {
+        for (auto& SectionName : this->SettingOrder)
+        {
+            auto& Section = this->SettingValues[SectionName];
+            for (auto& SettingName : Section.Order)
+            {
+                auto& Setting = Section.Values[SettingName];
+
+                if (Setting.Value)
+                {
+                    Setting.SettingStr = Setting.GetAsString();
+                    Setting.Value = nullptr;
+                }
+            }
+        }
     }
 
     void InitContext(std::filesystem::path Filepath)

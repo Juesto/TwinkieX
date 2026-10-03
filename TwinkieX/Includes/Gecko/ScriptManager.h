@@ -75,6 +75,9 @@ namespace Gecko
 		ScriptManager();
 		~ScriptManager();
 
+		Script* GetActiveScript();
+		asIScriptContext* GetActiveContext();
+
 		void BuildAll();
 		void BuildScript(Script&);
 		void BuildScriptByCallback(Script&, CallbackType);

@@ -50,7 +50,7 @@ void NodExplorerModule::SetMemberInfoPopup(CMwMemberInfo* MemberInfo, const std:
 	HasSetWindowPositionForPopup = false;
 }
 
-void NodExplorerModule::SetClassInfoPopup(CMwClassInfo* ClassInfo, const std::string NodName, CMwNod* Nod, bool IsNodImpersistent)
+void NodExplorerModule::SetClassInfoPopup(CMwClassInfo* ClassInfo, const std::string NodName, CMwNod* Nod, [[maybe_unused]] bool IsNodImpersistent)
 {
 	// Fix memory leak incase of user clicking on another nod while pop-up is still active
 	if (NodInfo)

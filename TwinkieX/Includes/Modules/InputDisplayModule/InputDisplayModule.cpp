@@ -18,8 +18,9 @@ InputDisplayModule::InputDisplayModule(TwinkTrackmania& TrackmaniaMgr)
 	this->Twinkie = &TrackmaniaMgr;
 	this->Name = "Input display";
 	this->ID = "InputDisplayModule";
+	this->StyleName = DashboardStyleNames[0];
 
-	Register("Dashboard", "Style", "Style", VSettingType::VString, &StyleName, false, { .Render = [this](VSetting* Setting) {
+	Veridian::Register("Dashboard", "Style", "Style", VSettingType::VString, &StyleName, false, { .Render = [this](VSetting* Setting) {
 		ImGui::SeparatorText("Style");
 		StyleIdx = std::string(DashboardStyleNames[0]) == StyleName ? 0 : (std::string(DashboardStyleNames[1]) == StyleName ? 1 : 2);
 		StyleName = DashboardStyleNames[StyleIdx];
@@ -31,17 +32,17 @@ InputDisplayModule::InputDisplayModule(TwinkTrackmania& TrackmaniaMgr)
 	StyleIdx = std::string(DashboardStyleNames[0]) == StyleName ? 0 : (std::string(DashboardStyleNames[1]) == StyleName ? 1 : 2);
 	StyleName = DashboardStyleNames[StyleIdx];
 
-	Register("Dashboard", "TMVizDim", "Force TMViz Dimensions", VSettingType::VBool, &ForceTMVizDimensions);
-	
-	Register("Dashboard", "ColorSteer", "Steer", VSettingType::VVec4, &ColorSteer, false, { .BeforeRender = [](VSetting*) { ImGui::SeparatorText("Colors"); return true; }});
-	Register("Dashboard", "ColorSteerI", "Steer (inactive)", VSettingType::VVec4, &ColorSteerI);
-	Register("Dashboard", "ColorAccel", "Acceleration", VSettingType::VVec4, &ColorAccel);
-	Register("Dashboard", "ColorAccelI", "Acceleration (inactive)", VSettingType::VVec4, &ColorAccelI);
-	Register("Dashboard", "ColorBrake", "Brake", VSettingType::VVec4, &ColorBrake);
-	Register("Dashboard", "ColorBrakeI", "Brake (inactive)", VSettingType::VVec4, &ColorBrakeI);
-	Register("Dashboard", "ColorBackground", "Background", VSettingType::VVec4, &ColorBackground);
+	Veridian::Register("Dashboard", "TMVizDim", "Force TMViz Dimensions", VSettingType::VBool, &ForceTMVizDimensions);
 
-	Register("Dashboard", "ShowInputDisplay", "ShowInputDisplay", VSettingType::VBool, &ShowInputDisplay, true);
+	Veridian::Register("Dashboard", "ColorSteer", "Steer", VSettingType::VVec4, &ColorSteer, false, { .BeforeRender = [](VSetting*) { ImGui::SeparatorText("Colors"); return true; } });
+	Veridian::Register("Dashboard", "ColorSteerI", "Steer (inactive)", VSettingType::VVec4, &ColorSteerI);
+	Veridian::Register("Dashboard", "ColorAccel", "Acceleration", VSettingType::VVec4, &ColorAccel);
+	Veridian::Register("Dashboard", "ColorAccelI", "Acceleration (inactive)", VSettingType::VVec4, &ColorAccelI);
+	Veridian::Register("Dashboard", "ColorBrake", "Brake", VSettingType::VVec4, &ColorBrake);
+	Veridian::Register("Dashboard", "ColorBrakeI", "Brake (inactive)", VSettingType::VVec4, &ColorBrakeI);
+	Veridian::Register("Dashboard", "ColorBackground", "Background", VSettingType::VVec4, &ColorBackground);
+
+	Veridian::Register("Dashboard", "ShowInputDisplay", "ShowInputDisplay", VSettingType::VBool, &ShowInputDisplay, true);
 
 	if (StyleName == "") StyleName = DashboardStyleNames[0];
 }

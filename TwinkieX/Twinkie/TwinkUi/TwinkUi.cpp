@@ -102,6 +102,8 @@ __declspec(noinline) TwinkUi::TwinkUi(TwinkTrackmania& TrackmaniaMgr)
 
 __declspec(noinline) TwinkUi::~TwinkUi()
 {
+	Veridian::VastVeridian->PrepareForDestruction();
+
 	delete Veridian::VastVeridian;
 
 	for (auto& Module : Modules)

@@ -14,9 +14,6 @@
 
 #include <Twinkie/TwinkFilePicker/TwinkFilePickerExports.h>
 
-// Veridian settings manager
-#include <Veridian/Veridian.h>
-
 #include <vector>
 
 class TwinkUi;
