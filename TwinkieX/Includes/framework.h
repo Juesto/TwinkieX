@@ -4,6 +4,9 @@
 
 #pragma warning(disable : 4738 5045 4710)
 
+// Must be defined before anything (directly or transitively) includes <dinput.h>
+#define DIRECTINPUT_VERSION 0x0800
+
 // Exclude rarely-used stuff from Windows headers
 #define WIN32_LEAN_AND_MEAN  
 
@@ -78,7 +81,6 @@
 
 #include <Veridian/Veridian.h>
 
-#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")

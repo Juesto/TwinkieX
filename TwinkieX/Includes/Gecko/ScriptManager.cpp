@@ -44,18 +44,22 @@ namespace Gecko
 		if (std::chrono::system_clock::now() >= *Timeout)
 		{
 			Ctx->Suspend();
-			TheScriptManager->Scripts[TheScriptManager->ActiveScriptIdx].Enabled = false;
+			TheScriptManager->GetActiveScript()->Enabled = false;
 		}
 	}
 
 	void MessageCallback(const asSMessageInfo* msg, void* param)
 	{
+#ifdef _DEBUG
 		const char* type = "ERR ";
 		if (msg->type == asMSGTYPE_WARNING)
 			type = "WARN";
 		else if (msg->type == asMSGTYPE_INFORMATION)
 			type = "INFO";
 		printf("%s (%d, %d) : %s : %s\n", msg->section, msg->row, msg->col, type, msg->message);
+#else
+		// TODO: Better error handling
+#endif
 	}
 
 	static std::u8string FromStr(const std::string& that)
@@ -89,6 +93,16 @@ namespace Gecko
 		// Exports::Global::Cleanup();
 		// Exports::ImGui::Cleanup();
 		// Exports::Reflection::Cleanup();
+	}
+
+	Script* ScriptManager::GetActiveScript()
+	{
+		return &(Scripts[ActiveScriptIdx]);
+	}
+
+	asIScriptContext* ScriptManager::GetActiveContext()
+	{
+		return Scripts[ActiveScriptIdx].Ctxs[(size_t)ActiveCallbackType];
 	}
 
 	void ScriptManager::BuildScriptByCallback(Script& Script, CallbackType CallbackType)

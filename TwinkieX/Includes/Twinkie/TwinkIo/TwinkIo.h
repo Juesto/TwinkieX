@@ -1,3 +1,4 @@
+#pragma once
 #include <dinput.h>
 #include <imgui/imgui.h>
 
