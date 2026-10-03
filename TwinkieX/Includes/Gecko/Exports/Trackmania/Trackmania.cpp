@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Trackmania.h"
 #include <Twinkie/Twinkie.h>
+#include <unordered_set>
 
 #undef GetObject
 #undef RegisterClass
@@ -12,45 +13,43 @@ namespace Gecko::Exports::Trackmania
 
 	namespace BaseTypes
 	{
-		static void __cdecl CMwNod_AddRef(CMwNod* Nod)
-		{
-			Nod->ReferenceCount++;
-		}
+		//static void __cdecl CMwNod_AddRef(CMwNod* Nod)
+		//{
+		//	Nod->ReferenceCount++;
+		//}
 
-		static void __cdecl CMwNod_RemoveRef(CMwNod* Nod)
-		{
-			Nod->ReferenceCount--;
-		}
+		//static void __cdecl CMwNod_RemoveRef(CMwNod* Nod)
+		//{
+		//	Nod->ReferenceCount--;
+		//}
 
 		static uint32_t __cdecl CFastArray_Length(CFastArrayGen* Array)
 		{
 			return Array->Size;
 		}
 
+		// Size in bytes of one element of a MwFastArray<T> instance
+		static uint32_t CFastArray_ElemSize(asIScriptEngine* Engine, asITypeInfo* ArrayType)
+		{
+			int SubTypeId = ArrayType->GetSubTypeId();
+
+			if ((SubTypeId & asTYPEID_MASK_OBJECT) == 0)
+				return Engine->GetSizeOfPrimitiveType(SubTypeId);
+
+			if (SubTypeId & asTYPEID_OBJHANDLE)
+				return sizeof(void*);
+
+			auto SubType = Engine->GetTypeInfoById(SubTypeId);
+			if (SubType->GetFlags() & asOBJ_VALUE)
+				return SubType->GetSize();
+
+			return sizeof(void*);
+		}
+
 		static void __cdecl CFastArray_opIndex(asIScriptGeneric* Script)
 		{
 			auto Engine = Script->GetEngine();
-
-			auto ArrayType = Engine->GetTypeInfoById(Script->GetObjectTypeId());
-			auto SubTypeId = ArrayType->GetSubTypeId();
-
-			uint32_t ElemSize = 0xFFFFFFFF;
-			if ((SubTypeId & asTYPEID_MASK_OBJECT) == 0)
-			{
-				ElemSize = Engine->GetSizeOfPrimitiveType(SubTypeId);
-			}
-			else if (SubTypeId & asTYPEID_OBJHANDLE)
-			{
-				ElemSize = sizeof(void*);
-			}
-			else
-			{
-				auto SubType = Engine->GetTypeInfoById(SubTypeId);
-				if (SubType->GetFlags() & asOBJ_VALUE)
-					ElemSize = SubType->GetSize();
-				else
-					ElemSize = sizeof(void*);
-			}
+			uint32_t ElemSize = CFastArray_ElemSize(Engine, Engine->GetTypeInfoById(Script->GetObjectTypeId()));
 
 			uint32_t Idx = Script->GetArgDWord(0);
 			CFastArrayGen* Array = (CFastArrayGen*)Script->GetObject();
@@ -60,10 +59,149 @@ namespace Gecko::Exports::Trackmania
 			Script->SetReturnAddress(Array->Get(Idx, ElemSize));
 		}
 
+		static bool __cdecl CFastArray_TemplateCallback(asITypeInfo* ArrayType, bool& DontGarbageCollect)
+		{
+			DontGarbageCollect = true;
+
+			int SubTypeId = ArrayType->GetSubTypeId();
+			if (SubTypeId == asTYPEID_VOID) return false;
+
+			if ((SubTypeId & asTYPEID_MASK_OBJECT) && !(SubTypeId & asTYPEID_OBJHANDLE))
+			{
+				auto SubType = ArrayType->GetEngine()->GetTypeInfoById(SubTypeId);
+				if ((SubType->GetFlags() & asOBJ_VALUE) && !(SubType->GetFlags() & asOBJ_POD))
+				{
+					// TODO: Raise an error here
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		// All arrays made by a script
+		static std::unordered_set<CFastArrayGen*> OwnedArrays;
+
+		static void CFastArray_FreeBuffer(asIScriptEngine* Engine, asITypeInfo* ArrayType, CFastArrayGen* Array)
+		{
+			if (not Array->Ptr) return;
+
+			int SubTypeId = ArrayType->GetSubTypeId();
+			if (SubTypeId & asTYPEID_OBJHANDLE)
+			{
+				auto SubType = Engine->GetTypeInfoById(SubTypeId);
+				auto Elems = (void**)Array->Ptr;
+				for (uint32_t i = 0; i < Array->Size; i++)
+					if (Elems[i]) Engine->ReleaseScriptObject(Elems[i], SubType);
+			}
+
+			delete[] (uint8_t*)Array->Ptr;
+			Array->Ptr = nullptr;
+			Array->Size = 0;
+		}
+
+		static void CFastArray_Construct(asITypeInfo* ArrayType, uint32_t Size, void* Memory)
+		{
+			CFastArrayGen* NewArray = new (Memory) CFastArrayGen();
+			OwnedArrays.insert(NewArray);
+
+#ifdef GAMEBOX
+			// Also copy the vftable because yes, arrays have vftables now
+			// Evil hack incoming
+			static uintptr_t CachedVf = 0;
+			if (!CachedVf)
+			{
+				auto& Twinkie = gTwinkie.TrackmaniaMgr;
+				auto Resources = Twinkie.ParamGet<CMwNod*>(Twinkie.GetApp(), "Resources");
+				auto AudioSources = Resources ? Twinkie.ParamGet<CFastArrayGen>(Resources, "AudioSources") : nullptr;
+				if (AudioSources) CachedVf = AudioSources->vf;
+			}
+
+			// TODO: Something better ^^
+			NewArray->vf = CachedVf;
+#endif
+			if (Size == 0) return;
+
+			uint32_t ElemSize = CFastArray_ElemSize(ArrayType->GetEngine(), ArrayType);
+
+			NewArray->Ptr = new uint8_t[(size_t)Size * ElemSize]();
+			NewArray->Size = Size;
+		}
+
+		static void CFastArray_ctor(asIScriptGeneric* Script)
+		{
+			asITypeInfo* ArrayType = *(asITypeInfo**)Script->GetAddressOfArg(0);
+			CFastArray_Construct(ArrayType, 0, Script->GetObject());
+		}
+
+		static void CFastArray_ctorSize(asIScriptGeneric* Script)
+		{
+			asITypeInfo* ArrayType = *(asITypeInfo**)Script->GetAddressOfArg(0);
+			CFastArray_Construct(ArrayType, Script->GetArgDWord(1), Script->GetObject());
+		}
+
+		static void CFastArray_dtor(asIScriptGeneric* Script)
+		{
+			auto Engine = Script->GetEngine();
+			auto Array = (CFastArrayGen*)Script->GetObject();
+
+			if (!OwnedArrays.erase(Array)) return;
+
+			CFastArray_FreeBuffer(Engine, Engine->GetTypeInfoById(Script->GetObjectTypeId()), Array);
+		}
+
+
+		static void CFastArray_opAssign(asIScriptGeneric* Script)
+		{
+			auto Engine = Script->GetEngine();
+			auto Dst = (CFastArrayGen*)Script->GetObject();
+			auto Src = (CFastArrayGen*)Script->GetArgObject(0);
+
+			Script->SetReturnAddress(Dst);
+
+			if (Dst == Src) return;
+
+			if (!OwnedArrays.contains(Dst))
+			{
+				if (auto Ctx = asGetActiveContext()) (void)0; // TODO: Raise an error, cannot assign to nod's array
+				return;
+			}
+
+			auto ArrayType = Engine->GetTypeInfoById(Script->GetObjectTypeId());
+			int SubTypeId = ArrayType->GetSubTypeId();
+			uint32_t ElemSize = CFastArray_ElemSize(Engine, ArrayType);
+
+			uint8_t* NewPtr = nullptr;
+			uint32_t NewSize = (Src->Ptr ? Src->Size : 0);
+			if (NewSize)
+			{
+				NewPtr = new uint8_t[(size_t)NewSize * ElemSize];
+				memcpy(NewPtr, Src->Ptr, (size_t)NewSize * ElemSize);
+
+				if (SubTypeId & asTYPEID_OBJHANDLE)
+				{
+					auto SubType = Engine->GetTypeInfoById(SubTypeId);
+					auto Elems = (void**)NewPtr;
+					for (uint32_t i = 0; i < NewSize; i++)
+						if (Elems[i]) Engine->AddRefScriptObject(Elems[i], SubType);
+				}
+			}
+
+			CFastArray_FreeBuffer(Engine, ArrayType, Dst);
+
+			Dst->Ptr = NewPtr;
+			Dst->Size = NewSize;
+		}
+
 		// Registers all base types used by the game.
 		static void RegistrarBaseTypes(asIScriptEngine* Engine)
 		{
-			Engine->RegisterObjectType("MwFastArray<T>", 0, asOBJ_REF | asOBJ_NOCOUNT | asOBJ_TEMPLATE);
+			Engine->RegisterObjectType("MwFastArray<T>", sizeof(CFastArrayGen), asOBJ_VALUE | asOBJ_TEMPLATE | asGetTypeTraits<CFastArrayGen>());
+			Engine->RegisterObjectBehaviour("MwFastArray<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in, bool&out)", asFUNCTION(CFastArray_TemplateCallback), asCALL_CDECL);
+			Engine->RegisterObjectBehaviour("MwFastArray<T>", asBEHAVE_CONSTRUCT, "void f(int&in)", asFUNCTION(CFastArray_ctor), asCALL_GENERIC);
+			Engine->RegisterObjectBehaviour("MwFastArray<T>", asBEHAVE_CONSTRUCT, "void f(int&in, uint)", asFUNCTION(CFastArray_ctorSize), asCALL_GENERIC);
+			Engine->RegisterObjectBehaviour("MwFastArray<T>", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(CFastArray_dtor), asCALL_GENERIC);
+			Engine->RegisterObjectMethod("MwFastArray<T>", "MwFastArray<T>& opAssign(const MwFastArray<T>&in)", asFUNCTION(CFastArray_opAssign), asCALL_GENERIC);
 			Engine->RegisterObjectMethod("MwFastArray<T>", "const uint get_Length() property", asFUNCTION(CFastArray_Length), asCALL_CDECL_OBJLAST);
 			Engine->RegisterObjectMethod("MwFastArray<T>", "T& opIndex(uint index)", asFUNCTION(CFastArray_opIndex), asCALL_GENERIC);
 			Engine->RegisterObjectMethod("MwFastArray<T>", "const T& opIndex(uint index) const", asFUNCTION(CFastArray_opIndex), asCALL_GENERIC);
@@ -89,7 +227,6 @@ namespace Gecko::Exports::Trackmania
 		{
 			if (From->ClassID == To->ClassID)
 			{
-				BaseTypes::CMwNod_AddRef(FromNod);
 				Script->SetReturnAddress(FromNod);
 				return;
 			}
@@ -120,11 +257,9 @@ namespace Gecko::Exports::Trackmania
 		if (Engine->GetTypeInfoByName(Class->GetName().c_str())) return;
 		ClassIDToInfo[Class->ClassID] = Class;
 		ClassNameToInfo[Class->GetName()] = Class;
-		Engine->RegisterObjectType(Class->GetName().c_str(), 0, asOBJ_REF);
+		Engine->RegisterObjectType(Class->GetName().c_str(), 0, asOBJ_REF | asOBJ_NOCOUNT);
 
 		if (Class->CtorFn) Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_FACTORY, (Class->GetName() + std::string("@ f()")).c_str(), (uintptr_t)Class->CtorFn, asCALL_CDECL);
-		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_ADDREF, "void f()", asFUNCTION(BaseTypes::CMwNod_AddRef), asCALL_CDECL_OBJFIRST);
-		Engine->RegisterObjectBehaviour(Class->GetName().c_str(), asBEHAVE_RELEASE, "void f()", asFUNCTION(BaseTypes::CMwNod_RemoveRef), asCALL_CDECL_OBJFIRST);
 	}
 
 	static void RegisterMemberVirtual(asIScriptEngine* Engine, CMwClassInfo* Class, CMwMemberInfo* Member)
@@ -175,7 +310,7 @@ namespace Gecko::Exports::Trackmania
 			Engine->RegisterObjectProperty(
 				Class->GetName().c_str(),
 				std::format(
-					"MwFastArray<{}>@ {}",
+					"MwFastArray<{}@> {}",
 					((CMwMemberInfoClassArray*)Member)->ArrayClassInfo->GetName(), Member->GetName()
 				).c_str(),
 				Member->MemberOffset
