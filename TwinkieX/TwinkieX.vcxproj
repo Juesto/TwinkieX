@@ -1095,6 +1095,14 @@
     <ClInclude Include="Includes\imgui\imstb_rectpack.h" />
     <ClInclude Include="Includes\imgui\imstb_textedit.h" />
     <ClInclude Include="Includes\imgui\imstb_truetype.h" />
+    <ClInclude Include="Includes\minhook\include\MinHook.h" />
+    <ClInclude Include="Includes\minhook\src\buffer.h" />
+    <ClInclude Include="Includes\minhook\src\hde\hde32.h" />
+    <ClInclude Include="Includes\minhook\src\hde\hde64.h" />
+    <ClInclude Include="Includes\minhook\src\hde\pstdint.h" />
+    <ClInclude Include="Includes\minhook\src\hde\table32.h" />
+    <ClInclude Include="Includes\minhook\src\hde\table64.h" />
+    <ClInclude Include="Includes\minhook\src\trampoline.h" />
     <ClInclude Include="Includes\Modules\AboutModule\AboutModule.h" />
     <ClInclude Include="Includes\Modules\ModuleAutoExport.h" />
     <ClInclude Include="Includes\Modules\NodExplorerModule\NodExplorerModule.h" />
@@ -1214,6 +1222,196 @@
     <ClCompile Include="Includes\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="Includes\imgui\imgui_tables.cpp" />
     <ClCompile Include="Includes\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Includes\minhook\src\buffer.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="Includes\minhook\src\hde\hde32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="Includes\minhook\src\hde\hde64.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="Includes\minhook\src\hook.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="Includes\minhook\src\trampoline.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|Win32'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMO|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMCN|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TM1|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMS|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMU|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ESWC|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='TMSX|x64'">/wd4668 /wd4201 /wd4206 /wd4464 /wd4255 /wd4310 /wd4242 /wd4244 /wd4701 /wd5045 /wd4711 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="Includes\Modules\AboutModule\AboutModule.cpp" />
     <ClCompile Include="Includes\Modules\ModuleAutoExport.cpp" />
     <ClCompile Include="Includes\Modules\NodExplorerModule\NodExplorerModule.cpp" />

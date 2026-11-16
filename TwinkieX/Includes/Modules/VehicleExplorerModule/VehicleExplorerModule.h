@@ -5,7 +5,7 @@
 class VehicleExplorer : public IModule
 {
 public:
-	VehicleExplorer(TwinkTrackmania& Twinkie, ILoggert& Loggert) : IModule{ Twinkie, Loggert, "VehicleExplorer", "Vehicle Explorer" } {}
+	VehicleExplorer(TwinkTrackmania& Twinkie, ILoggert& Loggert);
 
 	virtual ~VehicleExplorer() override;
 

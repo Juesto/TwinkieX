@@ -24,13 +24,19 @@
 #include <objbase.h>
 #pragma comment(lib, "winhttp.lib")
 
+
+#pragma warning(pop)
+
+#pragma warning(disable : 4701 4711)
+#pragma warning(push)
+#include <minhook/include/MinHook.h>
 #pragma warning(pop)
 
 // Architecture detection header file
 #include <Utils/Arch.h>
 
 // Disable all warnings emmitted by DirectX11
-#pragma warning(disable : 4061 4365 4820 4365 4005 5029 5267)
+#pragma warning(disable : 4061 4365 4820 4365 4005 5029 5267 4201)
 #pragma warning(push)
 
 // DirectX (11 for TMCN, 9 otherwise)

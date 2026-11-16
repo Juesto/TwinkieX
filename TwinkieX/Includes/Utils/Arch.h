@@ -14,7 +14,7 @@
 #endif
 
 // TMCN (TrackmaniaChina) is an x64 game
-#if defined(TMCN) and defined(X86)
+#if defined(TMCN) && defined(X86)
 #error "TMCN is only supported on x64 architecture."
 #endif
 
@@ -29,7 +29,7 @@
 #endif
 
 // TM1, TMO, TMS, TMSX and ESWC are x86 games
-#if defined(GAMEBOX) and defined(X64)
+#if defined(GAMEBOX) && defined(X64)
 #error "TM1, TMO, TMS, TMSX, TMU and ESWC are only supported on x86 architecture."
 #endif
 

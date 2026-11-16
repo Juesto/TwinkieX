@@ -14,6 +14,8 @@ Twinkie gTwinkie;
 // Ctor and initializer, also registers some settings for TwinkUi
 Twinkie::Twinkie()
 {
+	MH_Initialize();
+
 #ifndef NDEBUG
 	AllocConsole();
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
@@ -26,6 +28,8 @@ Twinkie::Twinkie()
 
 	DocumentsFolderPath = Buffer;
 	CoTaskMemFree(Buffer);
+
+
 
 	UiMgr.Logger.UpdateLogFileLoc(DocumentsFolderPath);
 
@@ -61,7 +65,8 @@ Twinkie::~Twinkie()
 	if (not TwinkUiState::ImGuiInit or TwinkUiState::ProcessTerminating) return;
 
 	delete Gecko::TheScriptManager;
-
+	
+	MH_Uninitialize();
 #ifdef MANIAPLANET
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -89,6 +94,13 @@ void Twinkie::Update()
 		if (File.path().extension() != ".as") continue;
 
 		Gecko::TheScriptManager->AddFromFile(File.path());
+	}
+
+	for (const auto& File : std::filesystem::directory_iterator(DocumentsFolderPath / "TwinkieX\\Modules"))
+	{
+		if (File.path().extension() != ".dll") continue;
+
+		LoadLibraryW(File.path().wstring().c_str());
 	}
 
 	Gecko::TheScriptManager->BuildAll();
