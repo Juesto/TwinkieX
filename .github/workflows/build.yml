@@ -31,6 +31,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-msbuild-all-
 
+      - name: Set up vcpkg
+        id: vcpkg
+        run: |
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" integrate install
+          New-Item -ItemType Directory -Force -Path "${{ runner.temp }}\vcpkg_cache" | Out-Null
+          "VCPKG_DEFAULT_BINARY_CACHE=${{ runner.temp }}\vcpkg_cache" >> $env:GITHUB_ENV
+          "commit=$(git -c safe.directory='*' -C $env:VCPKG_INSTALLATION_ROOT rev-parse HEAD)" >> $env:GITHUB_OUTPUT
+
+      - name: Setup vcpkg Binary Caching
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg_cache
+          key: vcpkg-${{ runner.os }}-${{ matrix.platform }}-${{ steps.vcpkg.outputs.commit }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-${{ matrix.platform }}-
+
       - name: Build Project
         shell: pwsh
         run: |
