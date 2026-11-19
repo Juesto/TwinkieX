@@ -23,14 +23,6 @@ jobs:
       - name: Install NSIS
         uses: negrutiu/nsis-install@v2
 
-      - name: Cache intermediate files
-        uses: actions/cache@v4
-        with:
-          path: Intermediates
-          key: ${{ runner.os }}-msbuild-all-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-msbuild-all-
-
       - name: Set up vcpkg
         id: vcpkg
         run: |
@@ -46,6 +38,18 @@ jobs:
           key: vcpkg-${{ runner.os }}-${{ matrix.platform }}-${{ steps.vcpkg.outputs.commit }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-${{ runner.os }}-${{ matrix.platform }}-
+
+      - name: Restore NuGet packages
+        run:
+          nuget restore TwinkieX.sln
+
+      - name: Cache intermediate files
+        uses: actions/cache@v4
+        with:
+          path: Intermediates
+          key: ${{ runner.os }}-msbuild-all-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-msbuild-all-
 
       - name: Build Project
         shell: pwsh
