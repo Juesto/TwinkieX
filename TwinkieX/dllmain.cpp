@@ -1,8 +1,6 @@
 // Precompiled headers.
 #include "pch.h"
 
-#include <DiscordGameSDK/DiscordStuff.h>
-
 // Class definition for the Twinkie class used by (Twinkie gTwinkie).
 #include <Twinkie/Twinkie.h>
 
@@ -14,7 +12,7 @@
 // It is used to initialize all hooks for the global Twinkie object (Twinkie gTwinkie).
 static DWORD WINAPI InitializerThread([[maybe_unused]] LPVOID lpParameter)
 {
-    TwinkUiState::UiMgr = gTwinkie.UiMgr;
+    TwinkUiState::UiMgr = &gTwinkie.UiMgr;
     if (GetAsyncKeyState(VK_PAUSE) < 0) return FALSE;
 
     // While the game is not initialized, wait
@@ -58,7 +56,7 @@ NoCreateTwinkie:
 }
 
 // DllMain runs when the DLL is attached/detached to a process.
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD CallReason, [[maybe_unused]] LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD CallReason, LPVOID lpReserved)
 {
     // Disables any subsequent (DLL_THREAD_ATTACH/DETACH) CallReasons for DllMain.
     DisableThreadLibraryCalls(hModule);
@@ -71,12 +69,18 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD CallReason, [[maybe_unused]] LPVOID
         CreateThread(NULL, 0, InitializerThread, NULL, 0, 0);
 		break;
     
-    // These are disabled via (DisableThreadLibraryCalls) up above, so it is okay for them to be wired to (DLL_PROCESS_DETACH) as well.
+    // These are disabled via (DisableThreadLibraryCalls) up above.
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
+        break;
 
     // Upon detaching from a process...
     case DLL_PROCESS_DETACH:
+        // A non-null (lpReserved) means the process is exiting and every other thread is already dead,
+        // so the global destructors must not wait on or release anything those threads owned.
+        TwinkUiState::ProcessTerminating = lpReserved != nullptr;
+
+        if (Veridian::VastVeridian) Veridian::VastVeridian->Save();
         break;
     }
 

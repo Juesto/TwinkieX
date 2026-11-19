@@ -209,43 +209,48 @@ void TwinkTrackmania::PushToStack(CMwStack* Stack, CMwMemberInfo* MemberInfo)
 	static CMwMemberInfo* OptimizationRemover = nullptr;
 	if (!OptimizationRemover) OptimizationRemover = nullptr;
 
-	if (Stack->m_Size != 0 and Stack->ppMemberInfos)
+	if (Stack->Size != 0 and Stack->ppMemberInfos)
 	{
-		realloc(Stack->ppMemberInfos, (Stack->m_Size + 1) * sizeof(CMwMemberInfo*));
+		realloc(Stack->ppMemberInfos, (Stack->Size + 1) * sizeof(CMwMemberInfo*));
 
-		Stack->ppMemberInfos[Stack->m_Size] = MemberInfo;
+		Stack->ppMemberInfos[Stack->Size] = MemberInfo;
 
-		Stack->m_Size++;
+		Stack->Size++;
 	}
 	else
 	{
 		Stack->ppMemberInfos = new CMwMemberInfo* { MemberInfo };
-		Stack->m_Size = 1;
+		Stack->Size = 1;
 	}
 	OptimizationRemover = *Stack->ppMemberInfos;
 #else
-	if (Stack->m_Size < 2)
+	if (Stack->Size < 2)
 	{
-		Stack->m_ContainedItems[Stack->m_Size] = CMwStack::Item{ MemberInfo, CMwStack::ITEM_MEMBER };
-		Stack->m_Size++;
+		Stack->ContainedItems[Stack->Size] = CMwStack::Item{ MemberInfo, CMwStack::ITEM_MEMBER };
+		Stack->Size++;
 	}
 	else
 	{
-		if (Stack->m_ExtraItemsCapacity != 0 and Stack->m_pExtraItems)
+		if (Stack->ExtraItemsCapacity != 0 and Stack->ExtraItems)
 		{
-			Stack->m_pExtraItems = (CMwStack::Item*)realloc(Stack->m_pExtraItems, (Stack->m_ExtraItemsCapacity + 1) * sizeof(CMwStack::Item));
+			Stack->ExtraItems = (CMwStack::Item*)realloc(Stack->ExtraItems, (Stack->ExtraItemsCapacity + 1) * sizeof(CMwStack::Item));
 		}
-		else if (Stack->m_ExtraItemsCapacity == 0)
+		else if (Stack->ExtraItemsCapacity == 0)
 		{
-			if (Stack->m_pExtraItems) free(Stack->m_pExtraItems);
-			Stack->m_pExtraItems = (CMwStack::Item*)malloc((Stack->m_ExtraItemsCapacity + 1) * sizeof(CMwStack::Item));
+			if (Stack->ExtraItems) free(Stack->ExtraItems);
+			Stack->ExtraItems = (CMwStack::Item*)malloc((Stack->ExtraItemsCapacity + 1) * sizeof(CMwStack::Item));
 		}
-		if (Stack->m_pExtraItems) Stack->m_pExtraItems[Stack->m_ExtraItemsCapacity] = CMwStack::Item{ MemberInfo, CMwStack::ITEM_MEMBER };
-		Stack->m_ExtraItemsCapacity++;
-		Stack->m_Size++;
+		if (Stack->ExtraItems) Stack->ExtraItems[Stack->ExtraItemsCapacity] = CMwStack::Item{ MemberInfo, CMwStack::ITEM_MEMBER };
+		Stack->ExtraItemsCapacity++;
+		Stack->Size++;
 	}
 #endif
 }
 #pragma optimize("", on)
+
+__declspec(noinline) EGame TwinkTrackmania::GetGame()
+{
+	return TWINKIEX_GAMEENUM;
+}
 
 // END Getters

@@ -5,12 +5,7 @@
 class VehicleExplorer : public IModule
 {
 public:
-	VehicleExplorer(TwinkTrackmania& Twinkie)
-	{
-		this->Twinkie = &Twinkie;
-		this->Name = "VehicleExplorer";
-		this->ID = "VehicleExplorer";
-	};
+	VehicleExplorer(TwinkTrackmania& Twinkie, ILoggert& Loggert);
 
 	virtual ~VehicleExplorer() override;
 

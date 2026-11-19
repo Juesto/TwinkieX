@@ -1,0 +1,7 @@
+<Project>
+  <ItemDefinitionGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ClCompile>
+      <AdditionalOptions>/experimental:deterministic /pathmap:$(GITHUB_WORKSPACE)\=.\ %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

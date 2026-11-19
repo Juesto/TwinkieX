@@ -1,3 +1,5 @@
+#pragma warning(push)
+#pragma warning(disable : 5267)
 // dear imgui, v1.92.4
 // (headers)
 
@@ -4167,3 +4169,4 @@ typedef ImFontAtlasRect ImFontAtlasCustomRect;
 #endif
 
 #endif // #ifndef IMGUI_DISABLE
+#pragma warning(pop)

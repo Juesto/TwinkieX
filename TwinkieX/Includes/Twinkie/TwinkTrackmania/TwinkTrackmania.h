@@ -35,26 +35,26 @@ public:
 
 	// Scans for a specific signature (sigscan) in the .exe.
 	// The signature MUST have at least 4 bytes, and the first 4 bytes must NOT be a wildcard.
-	uintptr_t SigScan(const char* Sig);
+	TWINKIEX_API uintptr_t SigScan(const char* Sig);
 
 	// Gets the main app object, usually defined as (CTrackMania*).
-	__declspec(noinline) CMwNod* GetApp();
+	TWINKIEX_API __declspec(noinline) CMwNod* GetApp();
 
 	// Gets the address to the Viewport of the main app
-	__declspec(noinline) CMwNod* GetViewport();
+	TWINKIEX_API __declspec(noinline) CMwNod* GetViewport();
 
 	// Gets the game's DirectX device, as LPDIRECT3DDEVICE9 for GAMEBOX, and ID3D11Device for MANIAPLANET
-	__declspec(noinline) uintptr_t GetDirectXDevice();
+	TWINKIEX_API __declspec(noinline) uintptr_t GetDirectXDevice();
 
 	// Gets the game's input port, for mouse and keyboard events (always CDx8InputPort or similar)
-	__declspec(noinline) CInputPort* GetInputPort();
+	TWINKIEX_API __declspec(noinline) CInputPort* GetInputPort();
 
 	// Gets the engine manager that contains all classes
-	__declspec(noinline) CMwEngineManager* GetEngineManager();
+	TWINKIEX_API __declspec(noinline) CMwEngineManager* GetEngineManager();
 
 #ifdef GAMEBOX
 	// Sees if the intro when launching the game is over or not. Only for GAMEBOX
-	__declspec(noinline) bool GetIsIntroOver();
+	TWINKIEX_API __declspec(noinline) bool GetIsIntroOver();
 #endif
 
 	// Not for direct use. Use ParamGet instead.
@@ -90,11 +90,14 @@ public:
 	bool ParamSet(CMwNod* Nod, const char* MemberName, ValueT* Value, bool IsNodImpersistent = false);
 
 	// Pushes member to stack.
-	void PushToStack(CMwStack* Stack, CMwMemberInfo* MemberInfo);
+	TWINKIEX_API void PushToStack(CMwStack* Stack, CMwMemberInfo* MemberInfo);
+
+	// Gets the game type.
+	TWINKIEX_API __declspec(noinline) EGame GetGame();
 
 #ifdef MANIAPLANET
 	// Gets the game's DirectX swap chain, only for TMCN/D3D11
-	__declspec(noinline) uintptr_t GetDirectXSwapChain();
+	TWINKIEX_API __declspec(noinline) uintptr_t GetDirectXSwapChain();
 #endif
 };
 
@@ -152,8 +155,8 @@ TwinkTrackmania::GetterReturnT<typename ReturnT> TwinkTrackmania::VirtualParamGe
 
 	struct
 	{
-		ReturnTypeT pReturnValue;
-		ReturnT Storage;
+		ReturnTypeT pReturnValue{};
+		ReturnT Storage{};
 	} Result;
 
 	CMwStack Stack = CMwStack();
@@ -208,6 +211,7 @@ bool TwinkTrackmania::VirtualParamSet(CMwNod* Nod, const char* MemberName, Value
 template<typename ReturnT>
 TwinkTrackmania::GetterReturnT<typename ReturnT> TwinkTrackmania::ParamGet(CMwNod* Nod, CMwMemberInfo* MemberInfo, bool IsNodImpersistent)
 {
+	// TODO: Better virtual member detection here and elsewhere
 	if (MemberInfo->MemberOffset == 0xFFFFFFFFU and not IsNodImpersistent)
 	{
 		return VirtualParamGet<ReturnT>(Nod, MemberInfo);
@@ -216,9 +220,14 @@ TwinkTrackmania::GetterReturnT<typename ReturnT> TwinkTrackmania::ParamGet(CMwNo
 	{
 		return &ReadAddr(ReturnT, ((uintptr_t)Nod) + MemberInfo->MemberOffset);
 	}
-	else
+	else if (MemberInfo->MemberOffset != 0xFFFFFFFFU)
 	{
 		return ReadAddr(ReturnT, ((uintptr_t)Nod) + MemberInfo->MemberOffset);
+	}
+	else
+	{
+		// TODO: Virtual members for impersistent nods?
+		return nullptr;
 	}
 }
 

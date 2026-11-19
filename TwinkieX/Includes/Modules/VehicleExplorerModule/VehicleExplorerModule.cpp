@@ -1,11 +1,15 @@
 #include "pch.h"
 #ifdef TMCN
 #include <Modules/VehicleExplorerModule/VehicleExplorerModule.h>
+#include <Modules/ModuleAutoExport.h>
 #include <format>
 
 #define CopyButton(Thing) do { if (SmallButton("Copy")) { TempPtrBuffer = PtrToString(Thing); SetClipboardText(TempPtrBuffer.c_str()); MemAddress = (uint64_t)Thing; } } while (false)
 #define PreviewPtr(Thing) do { PushID(Thing); Text(#Thing ": %p", Thing); SameLine(); CopyButton(Thing); PopID(); } while (false)
 
+VehicleExplorer::VehicleExplorer(TwinkTrackmania & Twinkie, ILoggert & Loggert) : IModule{ Twinkie, Loggert, "VehicleExplorer", "Vehicle Explorer" } 
+{
+}
 
 VehicleExplorer::~VehicleExplorer() {}
 
@@ -76,6 +80,10 @@ void VehicleExplorer::Render()
 
 	End();
 }
+
+#ifdef TMCN
+MODULE_EXPORT(VehicleExplorer);
+#endif
 
 // NOTES:
 // VelocityVec3 = Vehicle + 0x258

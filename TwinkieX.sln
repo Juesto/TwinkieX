@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwinkieX", "TwinkieX\TwinkieX.vcxproj", "{279DDCC0-04C0-4CA2-8323-AE28F21EF1F5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9E196799-FAEF-4A6A-B19C-35EA2D79C02E} = {9E196799-FAEF-4A6A-B19C-35EA2D79C02E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DInput8Loader", "DInput8Loader\DInput8Loader.vcxproj", "{9E196799-FAEF-4A6A-B19C-35EA2D79C02E}"
 EndProject

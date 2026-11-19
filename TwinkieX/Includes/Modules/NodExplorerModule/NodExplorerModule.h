@@ -3,6 +3,10 @@
 #include <string>
 
 constexpr bool IsMemberClassAdjacent(CMwMemberInfo* Member);
+namespace Gecko::Exports::Trackmania 
+{
+	extern std::unordered_map<uint32_t, CMwClassInfo*> ClassIDToInfo;
+}
 
 // Contains info about a nod. This info is used whenever a nod is right-clicked and a popup shows up
 struct PopupNodInfo
@@ -24,6 +28,7 @@ struct PopupMemberInfo
 	const std::string Name = "";
 	CMwMemberInfo* MemberInfo = nullptr;
 	CMwClassInfo* ParentClassInfo = nullptr;
+	void* MemberPtr = nullptr;
 	CMwNod* ParentNod = 0;
 
 	// When the member is CLASS-adjacent, this value is non-null and it will be the member itself
@@ -57,12 +62,7 @@ class NodExplorerModule : public IModule
 	bool HasSetWindowPositionForPopup = false;
 
 public:
-	NodExplorerModule(TwinkTrackmania& Twinkie)
-	{
-		this->Twinkie = &Twinkie;
-		this->Name = "NodExplorer";
-		this->ID = "NodExplorer";
-	};
+	NodExplorerModule(TwinkTrackmania& Twinkie, ILoggert& Loggert) : IModule{ Twinkie, Loggert, "NodExplorerModule", "Nod Explorer" } {};
 
 	virtual ~NodExplorerModule() = default;
 

@@ -8,7 +8,7 @@ namespace Gecko::Exports::Global
 	// void yield(uint frames);
 	void yieldFor(uint32_t);
 	// void print(const string&in);
-	void print(std::string&);
+	void print(std::u8string&);
 
 	// Registers all globals with an engine.
 	void Registrar(asIScriptEngine*);

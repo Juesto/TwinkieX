@@ -34,7 +34,7 @@ namespace Veridian
             std::fstream(Filepath.wstring(), std::ios::in | std::ios::out | std::ios::trunc).close();
         }
 
-        FileStream.open(Filepath.wstring(), std::ios::in | std::ios::out);
+        std::ifstream FileStream(Filepath.wstring());
 
         if (not FileStream.is_open())
         {
@@ -68,24 +68,62 @@ namespace Veridian
         }
     }
 
-    VSetCtx::~VSetCtx()
+    void VSetCtx::Save()
     {
-        FileStream.clear();
-        FileStream.seekp(0);
+        std::string Contents;
 
-        for (auto& Sector : SettingValues)
+        auto WriteSection = [this, &Contents](const std::string& SectionName)
         {
-            FileStream << "[" << Sector.first << "]\n";
+            auto& Section = SettingValues[SectionName];
 
-            for (auto& Setting : SettingValues[Sector.first].Order)
+            Contents += std::format("[{}]\n", SectionName);
+
+            for (auto& SettingName : Section.Order)
             {
-                FileStream << SettingValues[Sector.first].Values[Setting].Name << "=" << SettingValues[Sector.first].Values[Setting].GetAsString() << "\n";
+                Contents += std::format("{}={}\n", SettingName, Section.Values[SettingName].GetAsString());
             }
 
-            FileStream << "\n";
+            // Keep settings that were loaded but not registered this session
+            for (auto& [SettingName, Setting] : Section.Values)
+            {
+                if (std::find(Section.Order.begin(), Section.Order.end(), SettingName) != Section.Order.end()) continue;
+
+                Contents += std::format("{}={}\n", SettingName, Setting.GetAsString());
+            }
+
+            Contents += "\n";
+        };
+
+        for (auto& SectionName : SettingOrder)
+        {
+            WriteSection(SectionName);
+        }
+        for (auto& [SectionName, Section] : SettingValues)
+        {
+            if (std::find(SettingOrder.begin(), SettingOrder.end(), SectionName) != SettingOrder.end()) continue;
+
+            WriteSection(SectionName);
         }
 
+        if (Contents == LastSaved) return;
+
+        // Write to a temporary file first, so that being killed mid-write doesn't corrupt the settings
+        auto TempFilepath = Filepath;
+        TempFilepath += ".tmp";
+
+        std::ofstream FileStream(TempFilepath.wstring(), std::ios::out | std::ios::trunc);
+
+        if (not FileStream.is_open()) return;
+
+        FileStream << Contents;
         FileStream.close();
+
+        if (FileStream.fail()) return;
+
+        std::error_code Error;
+        std::filesystem::rename(TempFilepath, Filepath, Error);
+
+        if (not Error) LastSaved = Contents;
     }
 
     VSetting& VSetCtx::Register(std::string Section, std::string Name, std::string FacingName, VSettingType Type, void* Value, bool Hidden, VSettingRenderFnStruct ExtraRenderFn)

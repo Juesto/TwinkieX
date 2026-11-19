@@ -5,9 +5,13 @@ param (
 
 # Try to get the latest git tag, fallback to "unknown" if git fails
 $gitVersion = "unknown"
+$gitVersionHttp = ""
 try {
     $gitVersion = (git describe --tags 2>$null) -replace '-[0-9]+-', '-'
     if ($LASTEXITCODE -ne 0) { $gitVersion = "unknown" }
+
+    $gitVersionHttp = $gitVersion -replace '-.*', ''
+    if ($LASTEXITCODE -ne 0) { $gitVersionHttp = "unknown" }
 } catch { }
 
 $headerContent = @"
@@ -16,6 +20,7 @@ $headerContent = @"
 // Do not edit manually!
 
 #define TWINKIEX_VERSION `"$gitVersion`"
+#define TWINKIEX_VERSION_HTTP `"$gitVersionHttp`"
 "@
 
 # Only overwrite if the content has changed to avoid unnecessary rebuilds

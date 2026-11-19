@@ -47,7 +47,7 @@ class InputDisplayModule : public IModule
 	bool ShowInputDisplay = false;
 public:
 	InputDisplayModule() = delete;
-	InputDisplayModule(TwinkTrackmania&);
+	InputDisplayModule(TwinkTrackmania&, ILoggert&);
 
 	virtual ~InputDisplayModule();
 	virtual void Render() override;

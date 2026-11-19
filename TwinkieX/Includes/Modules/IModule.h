@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Twinkie/TwinkTrackmania/TwinkTrackmania.h>
+#include <Twinkie/TwinkLogs/ILoggert.h>
 #include <imgui/imgui.h>
 #include <Veridian/Veridian.h>
 
@@ -10,13 +11,17 @@ class IModule
 public:
 	// Members
 
-	// A unique identifier for each module
+	// A unique identifier for each module.
 	const char* ID = "UnnamedModule";
-	// A name that can be displayed to the user as-is
+	// A name that can be displayed to the user as-is.
 	const char* Name = "Unnamed module";
 
-	// A reference to the TrackmaniaMgr
+	// A reference to the TrackmaniaMgr.
 	TwinkTrackmania* Twinkie = nullptr;
+
+	// A reference to the Loggert used for logging.
+	// Should be a global loggert for C++ modules (not the C++26 kind) like this one.
+	ILoggert* Loggert = nullptr;
 
 	// Controls whether or not the module is enabled. Use sparingly, as disabling an enabled module makes it unable to render anything.
 	bool Enabled = true;
@@ -24,11 +29,11 @@ public:
 	// Behaviors
 
 	// Ctor
-	IModule(TwinkTrackmania& Twinkie, const char*, const char*) : Twinkie(&Twinkie) {}
+	IModule(TwinkTrackmania& Twinkie, ILoggert& Loggert, const char* ID, const char* Name) : ID(ID), Name(Name), Twinkie(&Twinkie), Loggert(&Loggert) {}
 	IModule() {}
 	// Virtual Dtor
 	virtual ~IModule() = default;
-	
+
 	// Methods
 
 	// Called every frame

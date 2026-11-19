@@ -1,0 +1,86 @@
+@import url(https://fonts.bunny.net/css?family=bricolage-grotesque:300);
+
+body 
+{
+    font-family: "Bricolage Grotesque", sans-serif;
+    background-color: #4f004f;
+    color: white;
+}
+
+a, a:link, a:visited
+{
+    color: white;
+    text-decoration: none;
+}
+
+a:hover, a:active
+{
+    color: white;
+    text-decoration: underline;
+}
+
+h2
+{
+    padding: 5px;
+    margin: 0;
+}
+
+
+ul
+{
+    list-style: none;
+    padding-left: 0;
+}
+
+.compat-card
+{
+    margin: 5px;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding: 5px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 5px;
+    border-color: #aa00aa;
+}
+
+.compat-card > *
+{
+    margin: 5px;
+}
+
+.compat-card > p
+{
+    font-size: small;
+    padding: 1px;
+    margin: 1px;
+    margin-left: 4px;
+}
+
+.inline-code
+{
+    font-size: larger;
+}
+
+p
+{
+    font-size: x-small;
+    padding: 1px;
+    margin: 1px;
+    margin-left: 4px;
+}
+
+.full
+{
+    color: lightgreen;
+}
+
+.partial
+{
+    color: yellow;
+}
+
+.deleted
+{
+    color: lightcoral;
+}

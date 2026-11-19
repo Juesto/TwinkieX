@@ -1,0 +1,104 @@
+name: Test
+
+on:
+  push:
+    branches: [ "development" ]
+    paths:
+      - 'TwinkieX/**'
+      - 'DInput8Loader/**'
+      - '.github/workflows/test.yml'
+      - 'TwinkieX.sln'
+      - 'GenerateVersion.ps1'
+      - '.gitignore'
+      - 'Directory.Build.props'
+  pull_request:
+    branches: [ "development" ]
+    paths:
+      - 'TwinkieX/**'
+      - 'DInput8Loader/**'
+      - '.github/workflows/test.yml'
+      - 'TwinkieX.sln'
+      - 'GenerateVersion.ps1'
+      - '.gitignore'
+      - 'Directory.Build.props'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: TMCN
+            platform: x64
+            aka: x64
+          - config: ESWC
+            platform: x86
+            aka: Win32
+          - config: TMU
+            platform: x86
+            aka: Win32
+          - config: TMO
+            platform: x86
+            aka: Win32
+          - config: TMSX
+            platform: x86
+            aka: Win32
+          - config: TM1
+            platform: x86
+            aka: Win32
+  
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    - name: Restore file timestamps
+      uses: chetan/git-restore-mtime-action@v2
+
+    - name: Cache intermediate files
+      uses: actions/cache@v4
+      with:
+        path: Intermediates
+        key: ${{ runner.os }}-msbuild-${{ matrix.config }}-${{ matrix.platform }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-msbuild-${{ matrix.config }}-${{ matrix.platform }}-
+    
+    - name: Set up vcpkg
+      id: vcpkg
+      run: |
+        & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" integrate install
+        New-Item -ItemType Directory -Force -Path "${{ runner.temp }}\vcpkg_cache" | Out-Null
+        "VCPKG_DEFAULT_BINARY_CACHE=${{ runner.temp }}\vcpkg_cache" >> $env:GITHUB_ENV
+        "commit=$(git -c safe.directory='*' -C $env:VCPKG_INSTALLATION_ROOT rev-parse HEAD)" >> $env:GITHUB_OUTPUT
+
+    - name: Setup vcpkg Binary Caching
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/vcpkg_cache
+        key: vcpkg-${{ runner.os }}-${{ matrix.platform }}-${{ steps.vcpkg.outputs.commit }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-${{ matrix.platform }}-
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Restore NuGet packages
+      run:
+        nuget restore TwinkieX.sln
+    - name: Build Project
+      run: |
+        $env:CL = "/experimental:deterministic /pathmap:${{ github.workspace }}\=.\"
+        msbuild TwinkieX.sln `
+          /p:Configuration=${{ matrix.config }} `
+          /p:Platform=${{ matrix.platform }} `
+          /p:IncludePath="${{ github.workspace }}/TwinkieX/Includes" `
+          /m
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.config }}-${{ matrix.platform }}
+        path: ${{ github.workspace }}/Builds/${{ matrix.aka }}/${{ matrix.config }}/

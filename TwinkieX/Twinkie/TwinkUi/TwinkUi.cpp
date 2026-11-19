@@ -1,14 +1,7 @@
 // Precompiled headers.
 #include "pch.h"
 
-// imgui (just for intellisense)
-#ifdef GAMEBOX
-#include <imgui/imgui_impl_dx9.h>
-#else
-#include <imgui/imgui_impl_dx11.h>
-#endif
-
-#include <imgui/imgui_impl_win32.h>
+#include <Modules/ModuleAutoExport.h>
 
 // External dear ImGui WndProc handler declaration
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -29,6 +22,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace TwinkUiState
 {
+
 	// The original present function definition for the device.
 	PresentFn oPresent = 0;
 
@@ -53,6 +47,9 @@ namespace TwinkUiState
 
 	// The UiMgr
 	TwinkUi* UiMgr = nullptr;
+
+	// Whether the process is exiting, in which case teardown must be skipped
+	bool ProcessTerminating = false;
 
 #ifdef MANIAPLANET
 	// The DirectX11 context.
@@ -89,22 +86,15 @@ __declspec(noinline) TwinkUi::TwinkUi(TwinkTrackmania& TrackmaniaMgr)
 	// Set the trackmania manager reference for later use
 	this->TrackmaniaMgr = &TrackmaniaMgr;
 
+	// TODO: Make a loggert for discord RP
 	this->DiscordMgr = new TwinkDiscordRP(TrackmaniaMgr);
-
-	this->Modules.push_back(new NodExplorerModule(TrackmaniaMgr));
-	this->Modules.push_back(new AboutModule(TrackmaniaMgr));
-	this->Modules.push_back(new InputDisplayModule(TrackmaniaMgr));
-#ifdef TMCN
-	this->Modules.push_back(new AddictionUnlimiter(TrackmaniaMgr));
-	this->Modules.push_back(new VehicleExplorer(TrackmaniaMgr));
-#endif
 }
 
 __declspec(noinline) TwinkUi::~TwinkUi()
 {
-	Veridian::VastVeridian->PrepareForDestruction();
+	if (TwinkUiState::ProcessTerminating) return;
 
-	delete Veridian::VastVeridian;
+	Veridian::VastVeridian->PrepareForDestruction();
 
 	for (auto& Module : Modules)
 	{
@@ -123,6 +113,168 @@ __declspec(noinline) TwinkUi::~TwinkUi()
 // END Behaviors
 
 // Methods
+void TwinkUi::Render()
+{
+	using namespace ImGui;
+
+	Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Main);
+
+	IoMgr.Sync();
+
+	static double LastSaveTime = 0.0;
+	if (GetTime() - LastSaveTime > 1.0)
+	{
+		Veridian::VastVeridian->Save();
+		LastSaveTime = GetTime();
+	}
+
+	if (IsKeyPressed(ImGuiKey_F3, false))
+	{
+		TwinkUiState::RenderUi = !TwinkUiState::RenderUi;
+	}
+
+	if (Font) PushFont(Font, GetStyle().FontSizeBase * UiScale);
+
+	if (not ModuleQueue.empty())
+	{
+		for (auto& Module : this->ModuleQueue)
+		{
+			Modules.push_back(Module);
+			Veridian::Register("Modules", Module->ID, Module->Name, Veridian::VSettingType::VBool, &Module->Enabled);
+		}
+		ModuleQueue = {};
+	}
+
+	if (TwinkUiState::RenderUi)
+	{
+		static bool ShowLogs = true;
+
+		if (BeginMainMenuBar())
+		{
+			PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
+
+			if (BeginMenu("\\$f0fTwinkie##Twinkie"))
+			{
+				if (MenuItem("Include module"))
+				{
+					if (FilePicker)
+					{
+						delete FilePicker;
+						FilePicker = nullptr;
+					}
+
+					FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
+				}
+				if (MenuItem("Settings", "", ShowSettings))
+				{
+					ShowSettings = !ShowSettings;
+				}
+				if (BeginMenu("Modules"))
+				{
+					for (auto& Module : this->Modules)
+					{
+						if (MenuItem(Module->Name, "", Module->Enabled))
+						{
+							Module->Enabled = !Module->Enabled;
+						}
+					}
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			Gecko::TheScriptManager->RenderDevMenu();
+
+			if (BeginMenu("Modules##Twinkie"))
+			{
+				for (auto& Module : this->Modules)
+				{
+					if (!Module->Enabled) continue;
+
+					Module->RenderMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			for (auto& Module : this->Modules)
+			{
+				if (!Module->Enabled) continue;
+
+				Module->RenderMenuMain();
+			}
+
+			Logger.Render();
+
+			PopItemFlag();
+
+			ImGui::EndMainMenuBar();
+		}
+	}
+
+	if (ShowSettings)
+	{
+		if (Begin("Settings##Twinkie", &ShowSettings))
+		{
+			Veridian::RenderAll("Twinkie");
+		}
+		End();
+	}
+
+	for (auto& Module : this->Modules)
+	{
+		if (!Module->Enabled) continue;
+
+		Module->Render();
+		if (TwinkUiState::RenderUi) Module->RenderInterface();
+	}
+
+	Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Render);
+
+	if (Font) PopFont();
+
+	// ============== NO IMGUI DRAW CALLS PAST THIS POINT==============
+
+	if (FilePicker)
+	{
+		if (FilePicker->Done)
+		{
+			using enum TwinkFilePicker::FilePickerPurpose;
+
+			switch (FilePicker->Purpose)
+			{
+				case PickModule:
+				{
+					LoadLibrary(FilePicker->FinalPath.c_str());
+					break;
+				}
+				case PickFont:
+				{
+					char8_t UTF8FontPath[1025]{};
+#ifdef TMCN
+#pragma warning(push)
+#pragma warning(disable : 4267) // warning that fires when casting size_t to int in 64-bit
+#endif
+					WideCharToMultiByte(CP_UTF8, 0, FilePicker->FinalPath.c_str(), FilePicker->FinalPath.length(), (char*)UTF8FontPath, 1024, NULL, NULL);
+#ifdef TMCN
+#pragma warning(pop)
+#endif
+					Font = GetIO().Fonts->AddFontFromFileTTF((char*)UTF8FontPath);
+					FontPath = UTF8FontPath;
+					break;
+				}
+				case NoPurpose: break;
+			}
+
+			delete FilePicker;
+			FilePicker = nullptr;
+		}
+	}
+
+	DiscordMgr->Update();
+}
+
 
 __declspec(noinline) void TwinkUi::Update(std::filesystem::path pDocumentsFolderPath)
 {
@@ -140,6 +292,8 @@ __declspec(noinline) void TwinkUi::Update(std::filesystem::path pDocumentsFolder
 		return;
 		// This will quit only when the constructor (TwinkUi::TwinkUi) is called because it is called when initializing the (TwinkUi Twinkie::UiMgr).
 	}
+
+	CreateAndExportModules(this->Modules, *this->TrackmaniaMgr, &LoggertCpp);
 
 	// TMCN
 #ifdef MANIAPLANET
@@ -422,7 +576,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-			
+
 	if (not TwinkUiState::ImGuiInit)
 	{
 		if (not TwinkUiState::UiMgr->FontPath.empty())
@@ -518,151 +672,5 @@ HRESULT hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width
 	return oResizeBuffersResult;
 }
 #endif
-
-void TwinkUi::Render()
-{
-	using namespace ImGui;
-
-	IoMgr.Sync();
-
-	if (IsKeyPressed(ImGuiKey_F3, false))
-	{
-		TwinkUiState::RenderUi = !TwinkUiState::RenderUi;
-	}
-
-	if (Font) PushFont(Font, GetStyle().FontSizeBase * UiScale);
-
-	if (not ModuleQueue.empty())
-	{
-		for (auto& Module : this->ModuleQueue)
-		{
-			Modules.push_back(Module);
-			Veridian::Register("Modules", Module->ID, Module->Name, Veridian::VSettingType::VBool, &Module->Enabled);
-		}
-		ModuleQueue = {};
-	}
-
-	if (TwinkUiState::RenderUi)
-	{
-		if (BeginMainMenuBar())
-		{
-			PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
-
-			if (BeginMenu("$f0fTwinkie##Twinkie"))
-			{
-				if (MenuItem("Include module"))
-				{
-					if (FilePicker)
-					{
-						delete FilePicker;
-						FilePicker = nullptr;
-					}
-
-					FilePicker = new TwinkFilePicker(TwinkFilePicker::FilePickerPurpose::PickModule, DocumentsFolderPath / "TwinkieX\\Fonts");
-				}
-				if (MenuItem("Settings", "", ShowSettings))
-				{
-					ShowSettings = !ShowSettings;
-				}
-				if (BeginMenu("Modules"))
-				{
-					for (auto& Module : this->Modules)
-					{
-						if (MenuItem(Module->Name, "", Module->Enabled))
-						{
-							Module->Enabled = !Module->Enabled;
-						}
-					}
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenu();
-			}
-
-			if (BeginMenu("Modules##Twinkie"))
-			{
-				for (auto& Module : this->Modules)
-				{
-					if (!Module->Enabled) continue;
-
-					Module->RenderMenu();
-				}
-
-				ImGui::EndMenu();
-			}
-
-			for (auto& Module : this->Modules)
-			{
-				if (!Module->Enabled) continue;
-
-				Module->RenderMenuMain();
-			}
-
-			PopItemFlag();
-
-			ImGui::EndMainMenuBar();
-		}
-	}
-
-	if (ShowSettings)
-	{
-		if (Begin("Settings##Twinkie", &ShowSettings))
-		{
-			Veridian::RenderAll("Twinkie");
-		}
-		End();
-	}
-
-	for (auto& Module : this->Modules)
-	{
-		if (!Module->Enabled) continue;
-
-		Module->Render();
-		if (TwinkUiState::RenderUi) Module->RenderInterface();
-	}
-
-	Gecko::TheScriptManager->RunAll(Gecko::CallbackType::Render);
-
-	if (Font) PopFont();
-
-	// ============== NO IMGUI DRAW CALLS PAST THIS POINT==============
-
-	if (FilePicker)
-	{
-		if (FilePicker->Done)
-		{
-			using enum TwinkFilePicker::FilePickerPurpose;
-
-			switch (FilePicker->Purpose)
-			{
-				case PickModule:
-				{
-					LoadLibrary(FilePicker->FinalPath.c_str());
-					break;
-				}
-				case PickFont:
-				{
-					char8_t UTF8FontPath[1025]{};
-#ifdef TMCN
-#pragma warning(push)
-#pragma warning(disable : 4267) // warning that fires when casting size_t to int in 64-bit
-#endif
-					WideCharToMultiByte(CP_UTF8, 0, FilePicker->FinalPath.c_str(), FilePicker->FinalPath.length(), (char*)UTF8FontPath, 1024, NULL, NULL);
-#ifdef TMCN
-#pragma warning(pop)
-#endif
-					Font = GetIO().Fonts->AddFontFromFileTTF((char*)UTF8FontPath);
-					FontPath = UTF8FontPath;
-					break;
-				}
-				case NoPurpose: break;
-			}
-
-			delete FilePicker;
-			FilePicker = nullptr;
-		}
-	}
-
-	DiscordMgr->Update();
-}
 
 // END Methods

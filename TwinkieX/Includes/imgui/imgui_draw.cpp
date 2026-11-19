@@ -1723,19 +1723,20 @@ void ImDrawList::AddText(ImFont* font, float font_size, const ImVec2& pos, ImU32
         clip_rect.w = ImMin(clip_rect.w, cpu_fine_clip_rect->w);
     }
 
-    const char* dollar_sign = NULL;
+    size_t dollar_sign = size_t(-1);
+    std::string_view vu(text_begin, text_end ? text_end : text_begin + strlen(text_begin));
     if (!ignore_tm_formatting)
     {
-        dollar_sign = text_end ? (const char*)memchr(text_begin, '$', text_end - text_begin) : strchr(text_begin, '$');
+        dollar_sign = vu.find("\\$");
     }
 
-    if (ignore_tm_formatting || dollar_sign == NULL)
+    if (ignore_tm_formatting || dollar_sign == size_t(-1))
     {
         font->RenderText(this, font_size, pos, col, clip_rect, text_begin, text_end, wrap_width, (cpu_fine_clip_rect != NULL) ? ImDrawTextFlags_CpuFineClip : ImDrawTextFlags_None);
         return;
     }
 
-    int text_len = text_end ? (int)(text_end - text_begin) : (int)strlen(text_begin);
+    size_t text_len = vu.size();
     std::string raw_str(text_begin, text_len);
 
     TrackmaniaText::FormatSpecifierSearchResult SearchResult = TrackmaniaText::FindAllFormatSpecifiers(raw_str);
@@ -5545,19 +5546,18 @@ ImVec2 ImFontCalcTextSizeEx(ImFont* font, float size, float max_width, float wra
         text_end_display = text_end;
 
     std::string clean_text;
+    bool tm_stripped = false;
     const char* orig_text_begin = text_begin;
     const char* orig_text_end_display = text_end_display;
 
     if (!ignore_tm_formatting && text_begin != text_end_display)
     {
-        const char* dollar_sign = (const char*)memchr(text_begin, '$', text_end_display - text_begin);
-        if (dollar_sign != NULL)
+        std::string_view raw_view(text_begin, (size_t)(text_end_display - text_begin));
+        if (raw_view.find("\\$") != std::string_view::npos)
         {
-            // Slice the target area and strip formatting
-            std::string raw_slice(text_begin, text_end_display - text_begin);
-            clean_text = TrackmaniaText::FindAllFormatSpecifiers(raw_slice).OriginalText;
+            clean_text = TrackmaniaText::FindAllFormatSpecifiers(std::string(raw_view)).OriginalText;
+            tm_stripped = true;
 
-            // Redirect ImGui's pointers to our clean string!
             text_begin = clean_text.c_str();
             text_end_display = text_begin + clean_text.length();
             text_end = text_end_display;
@@ -5640,38 +5640,30 @@ ImVec2 ImFontCalcTextSizeEx(ImFont* font, float size, float max_width, float wra
 
     if (out_remaining != NULL)
     {
-        if (!clean_text.empty())
+        if (tm_stripped)
         {
             size_t clean_chars_processed = (size_t)(s - clean_text.c_str());
 
             size_t clean_count = 0;
             const char* p = orig_text_begin;
-
+            
             while (p < orig_text_end_display && clean_count < clean_chars_processed)
             {
-                if (*p == '$')
+                if (p[0] == '\\' && p + 1 < orig_text_end_display && p[1] == '$')
                 {
-                    if (p + 1 < orig_text_end_display)
-                    {
-                        if (p[1] == '$') {
-                            p += 2; // Skip '$$'
-                            clean_count++;
-                            continue;
-                        }
+                    p += 2; // Skip "\\$"
+                    if (p >= orig_text_end_display)
+                        break;
 
-                        // Skip tag
-                        char nextChar = p[1];
-                        p += 2;
-                        if (TrackmaniaText_IsHexadecimal(nextChar)) {
-                            if (p < orig_text_end_display) p++;
-                            if (p < orig_text_end_display) p++;
-                        }
-                    }
-                    else
+                    if (*p == '$')
                     {
-                        p++;
+                        p++; // "\$$" -> '$'
                         clean_count++;
+                        continue;
                     }
+
+                    const char* code_end = p + ((TrackmaniaText_IsHexadecimal(*p)) ? 3 : 1);
+                    p = code_end < orig_text_end_display ? code_end : orig_text_end_display;
                 }
                 else
                 {

@@ -1,0 +1,46 @@
+name: Compat
+
+on:
+  push:
+    branches: [ "development" ]
+    paths:
+      - 'TwinkieX/Includes/Gecko/Exports/**'
+      - 'CompatCheck/**'
+      - '.github/workflows/compat.yml'
+  pull_request:
+    branches: [ "development" ]
+    paths:
+      - 'TwinkieX/Includes/Gecko/Exports/**'
+      - 'CompatCheck/**'
+      - '.github/workflows/compat.yml'
+  workflow_dispatch:
+
+jobs:
+  compat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install python
+        uses: actions/setup-python@v7
+      
+      - name: Install python deps
+        run: python -m pip install -r ${{ github.workspace }}/CompatCheck/requirements.txt
+        
+      - name: Run compatcheck.py
+        run: | 
+          python CompatCheck/compatcheck.py -i ${{ github.workspace }}/ -a CompatCheck/OpenplanetCore.json -r -g
+      
+      - name: Publish percentage badge
+        uses: schneegans/dynamic-badges-action@v1.9.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 58af903812974242f5c4645caa2b77f2
+          filename: compatcheck_percentage_badge.json
+          label: Openplanet Compatiblity
+          message: ${{ env.NON_PARTIAL_PERCENTAGE }}%
+          valColorRange: ${{ env.NON_PARTIAL_PERCENTAGE }}
+          minColorRange: 0
+          maxColorRange: 100

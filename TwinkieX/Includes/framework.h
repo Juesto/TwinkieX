@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Version.h>
+#include <zip.h>
 
 #pragma warning(disable : 4738 5045 4710)
 
@@ -18,16 +18,25 @@
 #include <windows.h>
 #include <shlobj_core.h>
 #include <commdlg.h>
-
 #pragma comment(lib, "Comdlg32.lib")
+#include <winhttp.h>
+#pragma comment(lib, "windowscodecs.lib")
+#include <objbase.h>
+#pragma comment(lib, "winhttp.lib")
 
+
+#pragma warning(pop)
+
+#pragma warning(disable : 4701 4711)
+#pragma warning(push)
+#include <minhook/include/MinHook.h>
 #pragma warning(pop)
 
 // Architecture detection header file
 #include <Utils/Arch.h>
 
 // Disable all warnings emmitted by DirectX11
-#pragma warning(disable : 4061 4365 4820 4365)
+#pragma warning(disable : 4061 4365 4820 4365 4005 5029 5267 4201)
 #pragma warning(push)
 
 // DirectX (11 for TMCN, 9 otherwise)
@@ -39,6 +48,7 @@
 #else
 
 #include <d3d9.h>
+#include <D3dx9tex.h>
 
 #endif
 
@@ -47,6 +57,7 @@
 // dear ImGui
 // No idea why this define is needed
 #define IMGUI_DEFINE_MATH_OPERATORS
+#define IMGUI_API __declspec(dllexport)
 
 // Disable all warnings emmitted by dear ImGui
 #pragma warning(disable : 4191 4582 4774 5219)
@@ -61,7 +72,8 @@
 #endif
 
 #include <imgui/imgui_impl_win32.h>
-
+#include <imgui/imgui_internal.h>
+#include <stb/stb_image.h>
 
 #pragma warning(pop)
 
@@ -94,5 +106,7 @@
 #include <angelscript/sdk/add_on/scriptstdstring/scriptstdstring.h>
 #include <angelscript/sdk/add_on/scriptarray/scriptarray.h>
 #include <chrono>
+#include <iostream>
+#include <sstream>
 
 using namespace std::chrono_literals;

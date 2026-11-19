@@ -1,18 +1,11 @@
 #pragma once
 
+#include <Twinkie/TwinkLogs/TwinkLogs.h>
 #include <Twinkie/TwinkDiscordRP/TwinkDiscordRP.h>
 #include <Twinkie/TwinkIo/TwinkIo.h>
-
-// Modules
-#include <Modules/NodExplorerModule/NodExplorerModule.h>
-#include <Modules/AboutModule/AboutModule.h>
-#include <Modules/InputDisplayModule/InputDisplayModule.h>
-#ifdef TMCN
-#include <Modules/AddictionUnlimiterModule/AddictionUnlimiter.h>
-#include <Modules/VehicleExplorerModule/VehicleExplorerModule.h>
-#endif
-
 #include <Twinkie/TwinkFilePicker/TwinkFilePickerExports.h>
+
+#include <Modules/IModule.h>
 
 #include <vector>
 
@@ -72,6 +65,9 @@ namespace TwinkUiState
 	// The UiMgr
 	extern TwinkUi* UiMgr;
 
+	// Whether the process is exiting, in which case teardown must be skipped
+	extern bool ProcessTerminating;
+
 #ifdef MANIAPLANET
 	// The DirectX11 context.
 	extern DirectXContext* Context;
@@ -92,6 +88,9 @@ namespace TwinkUiState
 // The UI manager type, used by (TwinkUi gTwinkie.UiMgr).
 class TwinkUi
 {
+	TwinkUi operator=(TwinkUi) = delete;
+	TwinkUi& operator=(TwinkUi&) = delete;
+	TwinkUi&& operator=(TwinkUi&&) = delete;
 public:
 	// The Trackmania manager, set by (class Twinkie) to (TrackmaniaMgr Twinkie::TrackmaniaMgr)
 	TwinkTrackmania* TrackmaniaMgr = nullptr;
@@ -127,6 +126,8 @@ public:
 
 	// True if the current font is set to be destroyed/removed.
 	bool DestroyCurrentFont = false;
+
+	TwinkLogs Logger;
 
 	// Behaviors
 

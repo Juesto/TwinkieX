@@ -48,65 +48,41 @@ namespace TrackmaniaText
 		return Specifiers.end();
 	}
 
+    // Format specifiers start with "\$" (e.g. "\$f00", "\$o", "\$z"). A lone '$' or '\' is plain text.
+    // "\$$" produces a literal '$'. A trailing "\$" with nothing after it is dropped.
+    // Specifier codes are stored as "$<code>" (without the backslash), so FormatSpecifier and
+    // FormatState::ApplyFormatSpecifier don't need to know about the prefix.
+    // NOTE: ImFontCalcTextSizeEx (imgui_draw.cpp) mirrors this logic to map clean offsets back to raw text.
     FormatSpecifierSearchResult FindAllFormatSpecifiers(std::string Str)
     {
         FormatSpecifierSearchResult Founds = {};
+        const size_t Len = Str.length();
 
-        int CharsToGo = 0;
-        std::string Temp = "";
-
-        for (size_t CharIdx = 0; CharIdx < Str.length(); CharIdx++)
+        size_t CharIdx = 0;
+        while (CharIdx < Len)
         {
-            char Char = Str[CharIdx];
-            bool CharInvolvedInSpecifiers = false;
-
-            if (CharsToGo == 0)
+            if (Str[CharIdx] != '\\' || CharIdx + 1 >= Len || Str[CharIdx + 1] != '$')
             {
-                if (!Temp.empty())
-                {
-                    Founds.push_back(Temp, Founds.OriginalText.length());
-                    Temp = "";
-                }
-                CharsToGo = 1;
+                Founds.OriginalText.push_back(Str[CharIdx]);
+                CharIdx++;
+                continue;
             }
 
-            if (Char == '$' && Temp.empty())
+            CharIdx += 2; // Skip "\$"
+            if (CharIdx >= Len) break;
+
+            char Code = Str[CharIdx];
+            if (Code == '$')
             {
-                CharsToGo = 2;
-                Temp.push_back(Char);
-                CharInvolvedInSpecifiers = true;
-            }
-            else if (Char == '$' && Temp == "$")
-            {
-                CharsToGo = 1;
-                Temp = "";
-            }
-            else if (Temp.length() == 1)
-            {
-                if (TrackmaniaText_IsHexadecimal(Char))
-                {
-                    CharsToGo = 3;
-                }
-                Temp.push_back(Char);
-                CharInvolvedInSpecifiers = true;
-            }
-            else if (Temp.length() > 1)
-            {
-                Temp.push_back(Char);
-                CharInvolvedInSpecifiers = true;
+                Founds.OriginalText.push_back('$');
+                CharIdx++;
+                continue;
             }
 
-            CharsToGo -= 1;
-
-            if (!CharInvolvedInSpecifiers)
-            {
-                Founds.OriginalText.push_back(Char);
-            }
-        }
-
-        if (Temp.length() > 1)
-        {
-            Founds.push_back(Temp, Founds.OriginalText.length());
+            // Colors are 3 chars ("\$f00"), everything else is 1 char ("\$o").
+            size_t CodeLen = (TrackmaniaText_IsHexadecimal(Code)) ? 3 : 1;
+            Founds.push_back("$" + Str.substr(CharIdx, CodeLen), Founds.OriginalText.length());
+            CharIdx += CodeLen;
         }
 
         return Founds;

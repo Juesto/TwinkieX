@@ -14,7 +14,7 @@
 #endif
 
 // TMCN (TrackmaniaChina) is an x64 game
-#if defined(TMCN) and defined(X86)
+#if defined(TMCN) && defined(X86)
 #error "TMCN is only supported on x64 architecture."
 #endif
 
@@ -29,8 +29,8 @@
 #endif
 
 // TM1, TMO, TMS, TMSX and ESWC are x86 games
-#if defined(GAMEBOX) and defined(X64)
-#error "TM1, TMO, TMS, TMSX and ESWC are only supported on x86 architecture."
+#if defined(GAMEBOX) && defined(X64)
+#error "TM1, TMO, TMS, TMSX, TMU and ESWC are only supported on x86 architecture."
 #endif
 
 #if !defined(TMCN) && !defined(TM1) && !defined(TMO) && !defined(TMS) && !defined(TMSX) && !defined(ESWC) && !defined(TMU)
@@ -39,30 +39,37 @@
 
 #ifdef TMCN
 #define TWINKIEX_GAME "TMCN"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaChina)
 #define TWINKIEX_GAMELOWER "tmcn"
 #define TWINKIEX_GAMEFULL "TrackmaniaChina"
 #elif defined(TM1)
 #define TWINKIEX_GAME "TM1"
+#define TWINKIEX_GAMEENUM (::EGame::Trackmania1)
 #define TWINKIEX_GAMELOWER "tm1"
 #define TWINKIEX_GAMEFULL "TrackMania (2003)"
 #elif defined(TMO)
 #define TWINKIEX_GAME "TMO"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaOriginal)
 #define TWINKIEX_GAMELOWER "tmo"
 #define TWINKIEX_GAMEFULL "TrackMania Original"
 #elif defined(TMS)
 #define TWINKIEX_GAME "TMS"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaSunrise)
 #define TWINKIEX_GAMELOWER "tms"
 #define TWINKIEX_GAMEFULL "TrackMania Sunrise"
 #elif defined(TMSX)
 #define TWINKIEX_GAME "TMSX"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaSunriseExtreme)
 #define TWINKIEX_GAMELOWER "tmsx"
 #define TWINKIEX_GAMEFULL "TrackMania Sunrise eXtreme"
 #elif defined(ESWC)
 #define TWINKIEX_GAME "ESWC"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaNationsESWC)
 #define TWINKIEX_GAMELOWER "eswc"
 #define TWINKIEX_GAMEFULL "TrackMania Nations ESWC"
 #elif defined(TMU)
 #define TWINKIEX_GAME "TMU"
+#define TWINKIEX_GAMEENUM (::EGame::TrackmaniaUnited)
 #define TWINKIEX_GAMELOWER "tmu"
 #define TWINKIEX_GAMEFULL "Trackmania United"
 #else
@@ -70,3 +77,4 @@
 #endif
 
 #define TWINKIEX_DLL ("Twinkie" TWINKIEX_GAME ".dll")
+#define TWINKIEX_DLLW (L"Twinkie" TWINKIEX_GAME L".dll")

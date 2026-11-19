@@ -1,5 +1,6 @@
 #include "pch.h"
-#include <Modules/InputDisplayModule/InputDisplayModule.h>
+#include "InputDisplayModule.h"
+#include <Modules/ModuleAutoExport.h>
 
 const char* DashboardStyleNames[] = { "Pad", "Keyboard", "TMViz" };
 
@@ -11,11 +12,12 @@ ImVec2 InputDisplayModule::Lerp(ImVec2 A, ImVec2 B, float T)
 	return A2 + ((B2 - A2) * T);
 }
 
-InputDisplayModule::InputDisplayModule(TwinkTrackmania& TrackmaniaMgr)
+InputDisplayModule::InputDisplayModule(TwinkTrackmania& TrackmaniaMgr, ILoggert& Loggert)
 {
 	using namespace Veridian;
 
 	this->Twinkie = &TrackmaniaMgr;
+	this->Loggert = &Loggert;
 	this->Name = "Input display";
 	this->ID = "InputDisplayModule";
 	this->StyleName = DashboardStyleNames[0];
@@ -327,3 +329,5 @@ void InputDisplayModule::Render()
 	}
 	End();
 }
+
+MODULE_EXPORT(InputDisplayModule);

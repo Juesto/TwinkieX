@@ -18,7 +18,7 @@ struct CFastBufferGen
 	uint32_t Capacity = 0;
 #elif defined(GAMEBOX)
 	uint32_t Size = 0;
-	T* Ptr = nullptr;
+	void* Ptr = nullptr;
 	uint32_t Capacity = 0;
 #endif
 
@@ -64,9 +64,9 @@ struct CFastBuffer
 	const T* begin() const { return Ptr; }
 	const T* end() const { return Ptr + Size; }
 
-	operator CFastBufferGen* ()
+	operator CFastBufferGen ()
 	{
-		return reinterpret_cast<CFastBufferGen*>(this);
+		return *reinterpret_cast<CFastBufferGen*>(this);
 	}
 };
 
@@ -123,9 +123,9 @@ struct CFastArray
 	const T* begin() const { return Ptr; }
 	const T* end() const { return Ptr + Size; }
 
-	operator CFastArrayGen*()
+	operator CFastArrayGen ()
 	{
-		return reinterpret_cast<CFastArrayGen*>(this);
+		return *reinterpret_cast<CFastArrayGen*>(this);
 	}
 };
 
@@ -724,11 +724,11 @@ public:
 #ifdef GAMEBOX
 #pragma optimize("", off)
 	CMwMemberInfo** ppMemberInfos = nullptr;
-	uint32_t m_Size = 0;
-	uint32_t m_iCurrentPos = 0;
+	uint32_t Size = 0;
+	uint32_t CurrentPos = 0;
 #pragma optimize("", on)
 #elif defined(TMCN)
-	enum eItemType
+	enum ItemType
 	{
 		ITEM_MEMBER = 0,            
 		ITEM_BOOL = 0x10000001,
@@ -748,15 +748,15 @@ public:
 
 	struct Item
 	{
-		void*          m_pValue;     
-		eItemType       m_Type;
+		void* Value;    
+		ItemType Type;
 	};
 
-	uint32_t m_iCurrentPos;
-	uint16_t m_Size;
-	uint16_t m_ExtraItemsCapacity;
-	Item     m_ContainedItems[2];  
-	Item*    m_pExtraItems;        
+	uint32_t CurrentPos;
+	uint16_t Size;
+	uint16_t ExtraItemsCapacity;
+	Item     ContainedItems[2];  
+	Item*    ExtraItems;        
 #endif
 };
 
@@ -794,7 +794,7 @@ public:
 #ifdef TMCN
 template <typename WantedType>
 consteval
-CMwStack::eItemType TypeToStackItemType()
+CMwStack::ItemType TypeToStackItemType()
 {
 	if constexpr (std::is_same_v<WantedType, bool>)
 	{

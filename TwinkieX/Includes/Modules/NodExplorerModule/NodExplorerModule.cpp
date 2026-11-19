@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "NodExplorerModule.h"
+#include <Modules/ModuleAutoExport.h>
 #include <format>
 
 #define HasRightClickedOnItem() IsMouseClicked(ImGuiMouseButton_Right) and IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)
+
+using namespace Gecko::Exports::Trackmania;
 
 constexpr bool IsMemberClassAdjacent(CMwMemberInfo* Member)
 {
@@ -41,6 +44,7 @@ void NodExplorerModule::SetMemberInfoPopup(CMwMemberInfo* MemberInfo, const std:
 	ChildInfo->MemberInfo = MemberInfo;
 	ChildInfo->ParentNod = Nod;
 	ChildInfo->ParentClassInfo = ClassInfo;
+	ChildInfo->MemberPtr = Twinkie->ParamGet<uintptr_t /* literally anything works */>(Nod, MemberInfo, IsNodImpersistent);
 
 	if (IsMemberClassAdjacent(MemberInfo))
 	{
@@ -122,16 +126,20 @@ void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMem
 	std::string NodAddressStr = std::format("{:p}", (void*)Nod);
 	std::string ClassTypeName = std::format("{}*{}",
 		ClassInfo->ClassName,
-		MemberInfoAsClass and (MemberInfoAsClass->ClassInfo->ClassID != ClassInfo->ClassID) ? std::string(" $999(") + MemberInfoAsClass->ClassInfo->ClassName + "*)$z" : std::string("")
+		MemberInfoAsClass and (MemberInfoAsClass->ClassInfo->ClassID != ClassInfo->ClassID) ? std::string(" \\$999(") + MemberInfoAsClass->ClassInfo->ClassName + "*)\\$z" : std::string("")
 	); 
 	std::string TreeNodeLabel = std::format("{}{} {} ({})",
-		IsNodVirtual ? std::string("$66fV$z ") : std::string(""),
+		IsNodVirtual ? std::string("\\$66fV\\$z ") : std::string(""),
 		ClassTypeName,
 		NodName,
 		NodAddressStr
 	);
 
-	PushID((void*)Nod);
+	// TODO: Is this *really* needed?
+	// PushID((void*)Nod);
+	// Alternative:
+	PushID((void*)NodMemberInfo);
+
 	bool TreeNodeIsOpen = TreeNodeEx(TreeNodeLabel.c_str(), ImGuiTreeNodeFlags_DrawLinesFull);
 
 	if (HasRightClickedOnItem())
@@ -164,19 +172,19 @@ void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMem
 								(uint32_t)Param.Type.Type, 
 								Param.Type.AdditionalInfo < CMwMemberInfo::MAX ?
 									g_MemberTypeNames[Param.Type.AdditionalInfo] :
-									std::to_string   (Param.Type.AdditionalInfo)
-								,
-								(uint32_t)Param.Flags
+									(ClassIDToInfo.contains(Param.Type.AdditionalInfo) ? ClassIDToInfo[Param.Type.AdditionalInfo]->ClassName : std::to_string(Param.Type.AdditionalInfo))
+									,
+									(uint32_t)Param.Flags
 #else
-								"{} {}",
-								Param.Type.AdditionalInfo < CMwMemberInfo::MAX ?
+									"{} {}",
+									Param.Type.AdditionalInfo < CMwMemberInfo::MAX ?
 									g_MemberTypeSignatures[Param.Type.AdditionalInfo] :
-									std::to_string(Param.Type.AdditionalInfo)
-								,
-								Param.Name
+									(ClassIDToInfo.contains(Param.Type.AdditionalInfo) ? ClassIDToInfo[Param.Type.AdditionalInfo]->ClassName : std::to_string(Param.Type.AdditionalInfo))
+										,
+										Param.Name
 #endif
-							);
-						};
+									);
+									};
 
 						CMwMemberInfoProc::Param* ReturnParam = nullptr;
 
@@ -195,11 +203,11 @@ void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMem
 							}
 						}
 
-						std::string CumulativeProcSignature = 
-							ReturnParam ? 
-								ReturnParam->Type.AdditionalInfo < CMwMemberInfo::MAX ? 
-									(std::string)g_MemberTypeSignatures[ReturnParam->Type.AdditionalInfo] + " " :
-									std::to_string(ReturnParam->Type.AdditionalInfo) + " " 
+						std::string CumulativeProcSignature =
+							ReturnParam ?
+							ReturnParam->Type.AdditionalInfo < CMwMemberInfo::MAX ?
+							(std::string)g_MemberTypeSignatures[ReturnParam->Type.AdditionalInfo] + " " :
+							(std::string)(ClassIDToInfo.contains(ReturnParam->Type.AdditionalInfo) ? ClassIDToInfo[ReturnParam->Type.AdditionalInfo]->ClassName : std::to_string(ReturnParam->Type.AdditionalInfo)) + " "
 							: "void ";
 						CumulativeProcSignature += MemberInfo->MemberName;
 						CumulativeProcSignature += " (";
@@ -381,9 +389,26 @@ void NodExplorerModule::RenderNod(CMwNod* Nod, const std::string NodName, CMwMem
 						int* CurrentItem = Twinkie->ParamGet<int>(Nod, MemberInfo, IsNodImpersistent);
 						if (!CurrentItem) goto RerenderMember;
 						int CurrentItemV = *CurrentItem;
-						if (Combo((MemberAsEnum->EnumTypeName + (" " + FancyMemberName)).c_str(), &CurrentItemV, MemberAsEnum->EnumValueNames, MemberAsEnum->EnumValueNamesLength))
+						if (MemberAsEnum->EnumValueNames)
 						{
-							Twinkie->ParamSet(Nod, MemberInfo, &CurrentItemV);
+							if (Combo((MemberAsEnum->EnumTypeName + (" " + FancyMemberName)).c_str(), &CurrentItemV, MemberAsEnum->EnumValueNames, MemberAsEnum->EnumValueNamesLength))
+							{
+								Twinkie->ParamSet(Nod, MemberInfo, &CurrentItemV);
+							}
+						}
+						else if (MemberAsEnum->EnumTypeName)
+						{
+							if (InputInt((MemberAsEnum->EnumTypeName + (" " + FancyMemberName)).c_str(), &CurrentItemV))
+							{
+								Twinkie->ParamSet(Nod, MemberInfo, &CurrentItemV);
+							}
+						}
+						else
+						{
+							if (InputInt(FancyMemberName.c_str(), &CurrentItemV))
+							{
+								Twinkie->ParamSet(Nod, MemberInfo, &CurrentItemV);
+							}
 						}
 						break;
 					}
@@ -533,6 +558,14 @@ void NodExplorerModule::RenderNodInfoMemberInfo()
 	{
 		std::string Copyable = g_MemberTypeNames[(size_t)MemberInfo->MemberType];
 		if (Selectable((std::string("Copy: ") + Copyable + "").c_str()))
+		{
+			SetClipboardText(Copyable.c_str());
+			NodInfoPopup = false;
+		}
+	}
+	{
+		std::string Copyable = std::format("{:p}", ChildInfo->MemberPtr);
+		if (Selectable((std::string("Copy: ") + Copyable + " (ptr to member itself)").c_str()))
 		{
 			SetClipboardText(Copyable.c_str());
 			NodInfoPopup = false;
@@ -690,3 +723,5 @@ ContinueAfterRender:
 	}
 	return;
 }
+
+MODULE_EXPORT(NodExplorerModule);

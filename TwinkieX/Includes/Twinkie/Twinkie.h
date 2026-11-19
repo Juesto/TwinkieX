@@ -23,11 +23,13 @@
 class Twinkie
 {
 public:
+	DeleteImplOperatorEq(Twinkie);
+
 	// The trackmania manager.
 	TwinkTrackmania TrackmaniaMgr;
 
 	// The UI manager.
-	TwinkUi* UiMgr = nullptr;
+	TwinkUi UiMgr{ TrackmaniaMgr };
 
 	// Self-explanatory
 	std::filesystem::path DocumentsFolderPath;
